@@ -74,6 +74,7 @@ $lang['errors:invalidhashmethod'] = 'Invalid Hashing Algorithm';
 $lang['errors:invalidlogin'] = 'Incorrect Login Details';
 $lang['errors:filenotfound'] = 'File not found';
 $lang['errors:sessionkey'] = 'Session key must have a string value';
+$lang['errors:sessionnotstarted'] = 'Session has not been started';
 $lang['errors:uploadfail'] = 'File could not be uploaded due to unknown error';
 
 
@@ -149,6 +150,7 @@ $lang['save'] = 'Save';
 $lang['search'] = 'Search';
 $lang['searchitems'] = 'Search Items';
 $lang['searchusers'] = 'Search Users';
+$lang['security'] = 'Security';
 $lang['settings'] = 'Settings';
 $lang['signin'] = 'Sign In';
 $lang['signout'] = 'Sign Out';

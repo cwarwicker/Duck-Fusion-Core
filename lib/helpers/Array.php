@@ -434,6 +434,22 @@ abstract class Arr
 
     } 
 
+    /**
+     * Check if an array is multidimensional
+     * @param type $array
+     * @return boolean
+     */
+    public static function isMulti($array){
+        
+        if (!is_array($array)) { 
+            return false; 
+        } 
+        
+        $elements = array_filter($array, 'is_array');
+        return (count($elements) > 0);
+        
+    }
+    
     
 }
 

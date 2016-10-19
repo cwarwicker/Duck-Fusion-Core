@@ -12,6 +12,7 @@
 // Some constants
 const DF_PAGINATION_RANGE = 3;
 
+// Should I put these constants in their specific Helper file if they have one? Would make it tidier
 const DF_AUTH_LOCAL = 1;
 const DF_AUTH_LDAP = 2;
 
@@ -551,7 +552,35 @@ function df_error($e){
     
 }
 
-
+/**
+ * Convert single dimensional array of attributes to a string, to be used as html tag attributes
+ * @param type $attributes
+ * @return boolean
+ */
+function df_attributes_to_string($attributes){
+    
+    // Should only be 1 dimensional
+    if (!array_is_multi($attributes)){
+        
+        $list = array();
+        
+        foreach($attributes as $key => $val){
+            if ($val !== false && !is_null($val)){
+                if (is_string($key)){
+                    $list[] = \df_html($key) . '="'.\df_html($val).'"';
+                } else {
+                    $list[] = \df_html($val);
+                }
+            }
+        }
+        
+        return implode(" ", $list);
+        
+    }
+    
+    return false;
+    
+}
 
 
 
@@ -765,3 +794,12 @@ function array_grep($array, $exclude = array(), $flag = ARR_USE_VALS){
 function array_flatten($array) { 
     return \DF\Helpers\Arr::flatten($array);
 } 
+
+/**
+ * Check if an array is multidimensional
+ * @param type $array
+ * @return boolean
+ */
+function array_is_multi($array){
+    return \DF\Helpers\Arr::isMulti($array);
+}

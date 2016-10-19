@@ -13,14 +13,28 @@ namespace DF\Helpers;
 
 class Security {
 
-    public function __construct() {
+    public static function token($name, $create = true){
+        
+        $key = '_df_tkn_' . $name;
+        
+        // Check session is started
+        if (session_status() !== PHP_SESSION_ACTIVE){
+            throw new \DF\DFException( df_string('security'), df_string('errors:sessionnotstarted') );
+        }
+        
+        if (!isset($_SESSION[$key]) && $create){
+            $_SESSION[$key] = bin2hex( random_bytes(32) );
+        }
+        
+        return $_SESSION[$key];
         
     }
-
-    public function __destruct() {
+    
+    public static function isTokenValid($name, $value){
+        
+        $token = self::token($name);
+        return ($token === $value);
         
     }
 
 }
-
-?>
