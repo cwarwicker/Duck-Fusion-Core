@@ -1,0 +1,136 @@
+<?php
+
+/**
+ * DB interface
+ * 
+ * @copyright 28-Apr-2013
+ * @package DuckFusion
+ * @version 1
+ * @author Conn Warwicker <conn@cmrwarwicker.com>
+ */
+
+namespace DF;
+
+interface Database {
+
+    public function __construct($driver, $host, $user, $pass);
+    public function get();
+    public function connect($db = false);
+    public function disconnect();
+    
+    // Queries (RW)
+    public function execute($sql); # Execute pure SQL without any PDO. Returns a query resource
+    public function query($sql, $params = array()); # Returns query resource
+    public function select($table, $params = array(), $order = null, $fields = '*'); # Returns first row of Recordset object or false
+    public function selectAll($table, $params = array(), $order = null, $fields = '*', $limitFrom = 0, $limit = null); # Returns Recordset object or false
+    public function selectSQL($sql, $params = array()); # Returns Recordset object or false
+    public function selectRecord($table, $where = null, $params = array(), $fields="*", $order = null); # Returns first row of recordset or false
+    public function selectRecords($table, $where = null, $params = array(), $fields="*", $order = null); # Returns Recordset object or false
+    public function update($table, array $params, array $where = null, $limit = 1); # Return number of affected records
+    public function insert($table, array $params); # Return id()
+    public function delete($table, $params = array(), $limit = null); # Return number of affected records
+    public function count($table, $params = array(), $field = "*"); # Returns int
+    public function countSQL($sql, $params = array()); # Returns int
+    public function numRows(); # Returns int
+    public function id(); # Returns last insert id
+           
+    // Set/Get system bits and bobs
+    public function setAttribute($att, $val); # Set any attribute
+    public function setFetchMethod($method); # Set the fetch mode attribute E.g. OBJ, ASSOC, etc...
+    public function setPrefix($prefix); # Incase you want to prefix all table names
+    public function getMessage(); # Return error message
+    
+    // Affect values
+    public function escape($val); # Escapes a value if you are being a bellend and running a direct query without using PDO
+    public function wrap($val); # Wrap a field/table name with database-specific syntax. E.g. MySQL: `field`, MS SQL: [field], Oracle: "field", etc... in case of fields with spaces (rare but possible)
+    
+    // Transactions
+    public function start(); # Start transaction
+    public function end(); # End transaction
+    public function rollback(); # Rollback transaction
+    public function commit(); # Commit transaction
+    
+    // Meta Data
+    public function tableExists($table); # Returns bool
+    public function listTables(); # Returns Recordset of table info
+    public function fieldExists($table, $field); # Returns bool
+    public function listFields($table); # Returns Recordset of field info
+    public function printTable($table); # Print out the information about a table and its fields
+    
+    // Caching
+    public function cache($bool); # Turn caching on/off (t/f)
+    public function cacheDelete(array $path); # Delete a cache file in the path specified, e.g. /cache/queries/reports/view/7
+    public function cacheClear(); # Delete all cached queries
+    
+    // Misc
+    public function call($function, $params = null); # This calls any driver-specific functions not included in the DB layer. E.g. $DB->call('query'); would call mysql_query (if using MySQL)
+    public function dump(); # Dumps the current object's state
+    
+
+}
+
+
+
+
+
+class Recordset {
+    
+    private $data;
+    private $tmp;
+    private $rowNum = 0;
+    
+    /**
+     * Construct object and load in data (array or object probably)
+     * @param type $data 
+     */
+    public function __construct($data){
+        // if not an array for some reason, make it one
+        if (!is_array($data)) $data = array($data);
+        $this->data = $data;
+        $this->tmp = $data;
+    }
+    
+    /**
+     * Return all rows
+     */
+    public function all(){
+        return $this->data;
+    }
+    
+    /**
+     * Get the next row in the recordset
+     */
+    public function row(){
+        
+        // If there is an element, return it and increment which row we are on
+        if (isset($this->data[$this->rowNum])){
+            $this->rowNum++;
+            return $this->data[$this->rowNum - 1];
+        } else {
+            return false;
+        }
+        
+    }
+    
+    /**
+     * Count the records in this set
+     */
+    public function count(){
+        return count($this->data);
+    }
+    
+    /**
+     * Return how many records are left that we haven't accessed yet
+     */
+    public function left(){
+        return ($this->count() - $this->rowNum);
+    }
+    
+}
+
+// Include all DB classes
+//foreach( glob(df_SYS_CORE . "db/*.php") as $file ){
+//    include_once $file;
+//}
+
+include_once df_SYS_CORE . 'db' . df_DS . 'PDO.php';

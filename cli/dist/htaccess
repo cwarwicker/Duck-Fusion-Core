@@ -1,0 +1,14 @@
+Options +FollowSymLinks
+Options -Indexes
+
+# # # # Enable ReWriteEngine # # # #
+RewriteEngine On
+
+# # # # Set Base URL to "/" # # # # 
+RewriteBase /
+
+# # # # Redirect all Requests to index.php unless file (-f) or directory (-d) exists # # # #
+RewriteCond %{REQUEST_FILENAME} !-f [NC]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?Qs=$1 [PT,L]
+
