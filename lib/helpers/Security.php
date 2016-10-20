@@ -9,10 +9,16 @@
  * @author Conn Warwicker <conn@cmrwarwicker.com>
  */
 
+// Consider how (if) to implement same origin checking
+
 namespace DF\Helpers;
 
 class Security {
 
+    public static function generateToken($length = 32){
+        return bin2hex( random_bytes($length) );
+    }
+    
     public static function token($name, $create = true){
         
         $key = '_df_tkn_' . $name;
@@ -23,7 +29,7 @@ class Security {
         }
         
         if (!isset($_SESSION[$key]) && $create){
-            $_SESSION[$key] = bin2hex( random_bytes(32) );
+            $_SESSION[$key] = self::generateToken(32);
         }
         
         return $_SESSION[$key];

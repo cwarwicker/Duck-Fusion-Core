@@ -18,7 +18,11 @@ define('ARR_EXISTS_APPEND', 2); # If an element in the array already exists with
 define('ARR_USE_KEYS', 0);
 define('ARR_USE_VALS', 1);
 
-
+define('ARR_SORT_ASC', 'asc');
+define('ARR_SORT_DESC', 'desc');
+define('ARR_SORT_BY_VALUE', 'v');
+define('ARR_SORT_BY_KEY', 'k');
+//more
 
 abstract class Arr
 {
@@ -447,6 +451,49 @@ abstract class Arr
         
         $elements = array_filter($array, 'is_array');
         return (count($elements) > 0);
+        
+    }
+    
+    /**
+     * Sort an array in a given direction
+     * @param type $array
+     * @param type $order
+     * @param bool $recursive todo
+     * @return boolean
+     */
+    public static function sort(&$array, $order, $sortBy = ARR_SORT_BY_VALUE, $recursive = false){
+        
+        if (!is_array($array)){
+           return false;
+        }
+       
+        switch($order)
+        {
+            case ARR_SORT_ASC:
+                switch($sortBy)
+                {
+                    case ARR_SORT_BY_VALUE:
+                        asort($array, SORT_NATURAL);
+                    break;
+                    case ARR_SORT_BY_KEY:
+                        ksort($array, SORT_NATURAL);
+                    break;
+                }
+            break;
+            case ARR_SORT_DESC:
+                switch($sortBy)
+                {
+                    case ARR_SORT_BY_VALUE:
+                        arsort($array, SORT_NATURAL);
+                    break;
+                    case ARR_SORT_BY_KEY:
+                        krsort($array, SORT_NATURAL);
+                    break;
+                }
+            break;
+            
+        }
+       
         
     }
     

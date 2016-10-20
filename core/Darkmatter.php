@@ -26,41 +26,24 @@ define('df_SYS_CORE', df_SYS . 'core' . df_DS);
 //
 //ini_set("pcre.recursion_limit", df_STACK_SIZE);
 
-require df_SYS_CORE . 'Controller.php';
-require df_SYS_CORE . 'Model.php';
-require df_SYS_CORE . 'Quack.php';
-require df_SYS_CORE . 'Template.php';
-require df_SYS_CORE . 'Parser.php';
-require df_SYS_CORE . 'Router.php';
-require df_SYS_CORE . 'Exception.php';
-require df_SYS_CORE . 'Database.php';
-require df_SYS_CORE . 'App.php';
+require_once df_SYS_CORE . 'Controller.php';
+require_once df_SYS_CORE . 'Model.php';
+require_once df_SYS_CORE . 'Quack.php';
+require_once df_SYS_CORE . 'Template.php';
+require_once df_SYS_CORE . 'Parser.php';
+require_once df_SYS_CORE . 'Router.php';
+require_once df_SYS_CORE . 'Exception.php';
+require_once df_SYS_CORE . 'Database.php';
+require_once df_SYS_CORE . 'App.php';
 
 // Load all the Helpers
-// todo - put this in a function
-foreach ( glob(df_SYS . 'lib' . df_DS . 'helpers' . df_DS . '*') as $helper )
-{
-    if (is_file($helper))
-    {
-        require $helper;
-    }
-    elseif (is_dir($helper))
-    {
-        foreach ( glob($helper . df_DS . '*') as $helper )
-        {
-            if (is_file($helper))
-            {
-                require $helper;
-            }
-        }
-    }
-}
+\DF\App::loadAllHelpers();
 
-require df_SYS . 'common'.df_DS.'Functions.php';
+require_once df_SYS . 'common'.df_DS.'Functions.php';
 
 // Require files
 if (!defined('df_CLI')){
-    require df_APP_ROOT . df_DS .  'config' . df_DS . 'Config.php';
+    require_once df_APP_ROOT . df_DS .  'config' . df_DS . 'Config.php';
 }
 
 ob_start();

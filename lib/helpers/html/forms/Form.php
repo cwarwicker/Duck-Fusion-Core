@@ -1,0 +1,230 @@
+<?php
+
+/**
+ * Description of Form
+ * 
+ * @copyright 28-Apr-2013
+ * @package DuckFusion
+ * @version 1
+ * @author Conn Warwicker <conn@cmrwarwicker.com>
+ */
+
+namespace DF\Helpers;
+
+class Form {
+
+    private $id;
+    private $action;
+    private $attributes = array();
+    private $fields = array();
+    
+    public function __construct($id) {
+        $this->id = $id;
+    }
+    
+    public function reset(){
+        $this->id = null;
+        $this->action = null;
+        $this->attributes = array();
+        $this->fields = array();
+    }
+    
+    protected function getNextKey(){
+        
+        $last = end($this->fields);
+        if ($last){
+            $key = key($this->fields);
+            if (is_int($key)){
+                return $key + 1;
+            }
+        }
+        
+        return null;
+        
+    }
+
+    public function open( array $options ){
+                
+        // "url" key is for the action
+        if (array_key_exists('url', $options)){
+            $this->action = \df_html($options['url']);
+            unset($options['url']);
+        }
+        
+        // "files" key is to enable file uploads
+        if (array_key_exists('files', $options) && $options['files'] === true){
+            $this->attributes['enctype'] = 'multipart/form-data';
+            unset($options['files']);
+        }
+                
+        $this->attributes = array_merge($this->attributes, $options);
+        array_sort($this->attributes, ARR_SORT_ASC, ARR_SORT_BY_KEY);
+        
+    }
+    
+    /**
+     * Render the form and return the output
+     * @return string
+     */
+    public function render(){
+        
+        // Append CSRF token hidden field to the end of the form
+        $token = \DF\Helpers\Security::token($this->id);
+        $this->add('hidden', 'df_token', $token);
+        $this->add('hidden', 'submit_form_' . $this->id, 1);
+        
+        $output = "";
+        
+        $output .= "\n<form action='{$this->action}' ".  df_attributes_to_string($this->attributes)." >\n";
+        
+        if ($this->fields)
+        {
+            foreach($this->fields as $field)
+            {
+                $output .= $field->render() . "\n";
+            }
+        }        
+        
+        $output .= "</form>\n";
+        
+        return $output;
+        
+    }
+    
+    public function add($type, $name, $value = null, $attributes = null, $options = null){
+        
+        $type = strtolower( trim($type) );
+        $field = false;
+                
+        switch($type)
+        {
+            case 'hidden':
+            case 'text':
+            case 'password':
+            case 'submit':
+            case 'reset':
+            case 'button':
+            case 'checkbox':
+            case 'color':
+            case 'date':
+            case 'datetime':
+            case 'datetime-local':
+            case 'email':
+            case 'file':
+            case 'image':
+            case 'month':
+            case 'number':
+            case 'radio':
+            case 'range':
+            case 'search':
+            case 'tel':
+            case 'time':
+            case 'url':
+            case 'week':
+                $field = new \DF\Helpers\Form\Input();
+                $field->setType($type);
+            break;
+        
+            case 'select':
+                $field = new \DF\Helpers\Form\Select();
+                $field->setOptions($options);
+            break;
+        
+            case 'textarea':
+                $field = new \DF\Helpers\Form\Textarea();
+            break;            
+        
+        }
+        
+        // If valid field
+        if ($field)
+        {
+            $field->setName($name);
+            $field->setValue($value);
+            $field->setAttributes($attributes);
+            $this->fields[] = $field;
+        }
+        
+        return $this;
+        
+    }
+    
+    
+    public function data(){
+        
+        $method = $this->getMethod();
+        
+        switch($method)
+        {
+            case 'post':
+                $data = $_POST;
+            break;
+            case 'get':
+                $data = $_GET;
+            break;
+            default:
+                $data = $_REQUEST;
+            break;
+        }
+        
+        // Is this form submitted?
+        if (isset($data['submit_form_'.$this->id])){
+            return $data;
+        }
+        
+        return false;
+        
+    }
+    
+    public function getFile($name){
+        return (isset($_FILES[$name])) ? $_FILES[$name] : false;
+    }
+    
+    public function getMethod(){
+        
+        $method = (array_key_exists('method', $this->attributes)) ? strtolower($this->attributes['method']) : false;
+        return $method;
+        
+    }
+    
+    /**
+     * At the moment this only checks the method, and only if it's been defined in the form
+     * @return boolean
+     */
+    public function isSafe(){
+                        
+        // First check if the method is set in the form and then if the request method matches
+        $method = $this->getMethod();
+        if ($method)
+        {
+            if (strcasecmp($method, $_SERVER['REQUEST_METHOD']) !== 0 )
+            {
+                return false;
+            }
+        }
+        
+        return true;
+        
+    }
+    
+    /**
+     * Check if the token was submitted with the form, and if it matches the token in the user's session
+     * @return type
+     */
+    public function isTokenValid(){
+        
+        $data = $this->data();
+        if (!$data){
+            return false;
+        }
+        
+        $token = \DF\Helpers\Security::token($this->id);
+        $submitted = (array_key_exists('df_token', $data)) ? $data['df_token'] : false;
+        
+        return ($submitted === $token);
+        
+    }
+    
+   
+    
+}

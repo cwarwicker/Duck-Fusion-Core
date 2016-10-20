@@ -264,6 +264,9 @@ function df_setup(){
     if (file_exists(df_APP_ROOT . df_DS . 'lib.php')){
         require_once df_APP_ROOT . df_DS . 'lib.php';
     }
+    
+    // Start the DF session
+    \DF\Helpers\Session::init();
         
 }
 
@@ -559,6 +562,10 @@ function df_error($e){
  */
 function df_attributes_to_string($attributes){
     
+    if (is_null($attributes) || $attributes === false){
+        return false;
+    }
+    
     // Should only be 1 dimensional
     if (!array_is_multi($attributes)){
         
@@ -581,6 +588,67 @@ function df_attributes_to_string($attributes){
     return false;
     
 }
+
+
+
+
+/**
+ * Convert a max_filesize value to an int of bytes
+ * I'll be honest with you, I can't remember how this works, and looking at it I have no idea... But it doess
+ * @param type $val e.g. 128M
+ * @return int e.g. ..
+ */
+function df_get_bytes_from_upload_max_filesize($val)
+{
+    
+    $val = trim($val);
+    $last = strtolower($val[strlen($val)-1]);
+    switch($last) {
+        case 'g':
+            $val *= 1024;
+        case 'm':
+            $val *= 1024;
+        case 'k':
+            $val *= 1024;
+    }
+
+    return $val;
+    
+}
+
+/**
+ * Convert a number of bytes into a human readable string
+ * @param type $bytes
+ * @param type $precision
+ * @return type
+ */
+function df_convert_bytes_to_hr($bytes, $precision = 2)
+{	
+    $kilobyte = 1024;
+    $megabyte = $kilobyte * 1024;
+    $gigabyte = $megabyte * 1024;
+    $terabyte = $gigabyte * 1024;
+
+    if (($bytes >= 0) && ($bytes < $kilobyte)) {
+            return $bytes . ' B';
+
+    } elseif (($bytes >= $kilobyte) && ($bytes < $megabyte)) {
+            return round($bytes / $kilobyte, $precision) . ' KB';
+
+    } elseif (($bytes >= $megabyte) && ($bytes < $gigabyte)) {
+            return round($bytes / $megabyte, $precision) . ' MB';
+
+    } elseif (($bytes >= $gigabyte) && ($bytes < $terabyte)) {
+            return round($bytes / $gigabyte, $precision) . ' GB';
+
+    } elseif ($bytes >= $terabyte) {
+            return round($bytes / $terabyte, $precision) . ' TB';
+    } else {
+            return $bytes . ' B';
+    }
+}
+
+
 
 
 
@@ -802,4 +870,15 @@ function array_flatten($array) {
  */
 function array_is_multi($array){
     return \DF\Helpers\Arr::isMulti($array);
+}
+
+/**
+ * Sort an array in a given direction
+ * @param type $array
+ * @param type $order
+ * @param type $recursive
+ * @return type
+ */
+function array_sort(&$array, $order, $sortBy = ARR_SORT_BY_VALUE, $recursive = false){
+    return \DF\Helpers\Arr::sort($array, $order, $sortBy, $recursive);
 }
