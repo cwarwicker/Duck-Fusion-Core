@@ -9,12 +9,14 @@ class CLI
 {
     
     public $actions = array(
-        'new-app'
+        'new-app',
+        'add-module'
     );
     
     private $app;
     private $dir;
     private $ns;
+    private $mod;
     
     public function isActionValid($action){
         return (in_array($action, $this->actions));
@@ -27,18 +29,91 @@ class CLI
             case 'new-app':
                 $this->runNewApp($param);
             break;
+            case 'add-module':
+                $this->runAddModule($param);
+            break;
         }
                 
     }
     
+    private function getNameSpaceFromAppName($name){
+        $namespace = preg_replace("/[^a-z_]/i", "", $name);
+        return $namespace;
+    }
+    
+    private function getAppNameSpace(){
+        return $this->getNameSpaceFromAppName($this->app);
+    }
+    
+    private function runAddModule($param){
+        
+        $app = (isset($param[0])) ? $param[0] : false;
+        $module = (isset($param[1])) ? $param[1] : false;
+        
+        // Strip any non-alphanumeric characters from name
+        $this->app = preg_replace("/[^a-z 0-9 \-_]/i", "", $app);
+        $this->mod = preg_replace("/[^a-z 0-9 \-_]/i", "", $module);
+        $this->ns = $this->getAppNameSpace();
+        
+        // Make sure module directory doesn't already exist
+        $dir = df_ROOT . 'app' . df_DS . $this->app . df_DS . 'modules' . df_DS . $this->mod . df_DS;
+        if (is_dir($dir)){
+            echo "Error: Directory {$dir} already exists\n";
+            echo "Either choose a new name for your module, or remove the existing directory\n\n";
+            exit;
+        }
+        
+        $this->dir = $dir;
+        
+        // Create app directory
+        if ( mkdir($this->dir, 0755) ){
+            echo "Created module directory ({$dir})...\n";
+        } else {
+            echo "Error: Cannot create directory. Permission denied\n";
+            exit;
+        }
+        
+        // Create all sub directories
+        $folders = array(
+            'controllers',
+            'models',
+            'views'
+        );
+        
+        foreach($folders as $folder){
+            
+            if ( mkdir($this->dir . df_DS . $folder, 0755) ){
+                echo "Created {$folder} directory in {$this->dir}...\n";
+            } else {
+                echo "Error: Cannot create directory ({$folder}). Permission denied.\n";
+                exit;
+            }
+            
+        }
+        
+        // Write files
+        $this->writeModuleControllerFile();
+        $this->writeModuleTemplateFile();
+        $this->writeModuleMainViewFile();
+        
+        
+    }
+    
+    /**
+     * Create a new app
+     * @param type $param
+     */
     private function runNewApp($param){
+        
+        if (is_array($param)){
+            $param = reset($param);
+        }
         
         // Strip any non-alphanumeric characters from name
         $app = preg_replace("/[^a-z 0-9 \-_]/i", "", $param);
         $this->app = $app;
                 
-        $namespace = preg_replace("/[^a-z_]/i", "", $this->app);
-        $this->ns = $namespace;
+        $this->ns = $this->getAppNameSpace();
             
         
         // Make sure directory doesn't already exist
@@ -56,7 +131,7 @@ class CLI
         if ( mkdir($this->dir, 0755) ){
             echo "Created app directory ({$this->app})...\n";
         } else {
-            echo "Error: Cannot create directory. Permission denied\n";
+            echo "Error: Cannot create directory ({$folder}). Permission denied\n";
             exit;
         }
         
@@ -105,6 +180,98 @@ class CLI
         $this->writeCssFile();
         $this->writeHtaccessFile();
         $this->writeIndexFile();
+        
+    }
+    
+    /**
+     * Create the Controller script for the module
+     */
+    private function writeModuleControllerFile()
+    {
+        
+        if ($this->app && $this->mod)
+        {
+            
+            $modName = ucfirst($this->mod);
+            $content = file_get_contents(df_SYS . 'cli' . df_DS . 'dist' . df_DS . 'modulecontroller.php');
+            $content = str_replace("%mod%", $modName, $content);
+            $content = str_replace("%ns%", $this->ns, $content);
+
+            $file = fopen($this->dir . 'controllers' . df_DS . $modName . 'Controller.php', 'w');
+            if (!$file)
+            {
+                echo "Error: Cannot create {$modName}Controller file in " . $this->dir . 'controllers' . df_DS . "\n";
+                exit;
+            }
+            
+            // Write content
+            fwrite($file, $content);
+            fclose($file);
+            
+            echo "{$modName}Controller file created...\n";
+            
+        }
+        
+    }
+    
+    /**
+     * Create the Template script for the module
+     */
+    private function writeModuleTemplateFile()
+    {
+        
+        if ($this->app && $this->mod)
+        {
+            
+            $modName = ucfirst($this->mod);
+            $content = file_get_contents(df_SYS . 'cli' . df_DS . 'dist' . df_DS . 'moduletemplate.php');
+            $content = str_replace("%mod%", $modName, $content);
+            $content = str_replace("%ns%", $this->ns, $content);
+
+            $file = fopen($this->dir . 'views' . df_DS . $modName . 'Template.php', 'w');
+            if (!$file)
+            {
+                echo "Error: Cannot create {$modName}Template file in " . $this->dir . 'views' . df_DS . "\n";
+                exit;
+            }
+            
+            // Write content
+            fwrite($file, $content);
+            fclose($file);
+            
+            echo "{$modName}Template file created...\n";
+            
+        }
+        
+    }
+    
+    /**
+     * Create the main template file for the module
+     */
+    private function writeModuleMainViewFile()
+    {
+        
+        if ($this->app && $this->mod)
+        {
+            
+            $modName = ucfirst($this->mod);
+            $content = file_get_contents(df_SYS . 'cli' . df_DS . 'dist' . df_DS . 'modulemain.html');
+            $content = str_replace("%mod%", $modName, $content);
+
+            $file = fopen($this->dir . 'views' . df_DS . 'main.html', 'w');
+            if (!$file)
+            {
+                echo "Error: Cannot create main.html file in " . $this->dir . 'views' . df_DS . "\n";
+                exit;
+            }
+            
+            // Write content
+            fwrite($file, $content);
+            fclose($file);
+            
+            echo "main.html file created...\n";
+            
+        }
         
     }
     
@@ -390,7 +557,7 @@ class CLI
 }
 
 $action = (isset($_SERVER['argv'][1])) ? $_SERVER['argv'][1]: false;
-$param = (isset($_SERVER['argv'][2])) ? $_SERVER['argv'][2]: false;
+$param = (count($_SERVER['argv'] > 2)) ? array_slice($_SERVER['argv'], 2): false;
 
 if (!$action){
     echo "Missing action\n\n";

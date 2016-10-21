@@ -76,7 +76,7 @@ class App {
         $scan = glob($dir . df_DS . '*');
         
         foreach ($scan as $path) {
-                        
+                                    
             if (preg_match('/\.php$/', $path)) {
                 require_once $path;
             }

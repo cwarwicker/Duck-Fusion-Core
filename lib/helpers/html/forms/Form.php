@@ -47,6 +47,7 @@ class Form {
                 
         // "url" key is for the action
         if (array_key_exists('url', $options)){
+            df_convert_url($options['url']);
             $this->action = \df_html($options['url']);
             unset($options['url']);
         }

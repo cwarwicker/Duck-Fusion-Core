@@ -648,7 +648,17 @@ function df_convert_bytes_to_hr($bytes, $precision = 2)
     }
 }
 
-
+function df_convert_url(&$url){
+    
+    // If URL does not contain http(s) then convert it to a full url
+    $Validate = new \DF\Helpers\ValidationField('url', $url, '');
+    $Validate->addRule( DF_VALIDATION_RULE_URL );
+    if (!$Validate->validate()){
+        global $cfg;
+        $url = $cfg->www . '/' . $url;
+    }
+    
+}
 
 
 
