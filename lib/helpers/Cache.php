@@ -1,5 +1,5 @@
 <?php
-
+// LOOK AT REMOVING THIS AND REPLACING WITH PRE-EXISTING CACHE COMPONENT
 /**
  * Description of Cache
  * 

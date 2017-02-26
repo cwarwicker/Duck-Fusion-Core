@@ -4,9 +4,7 @@
  * Authentication helper class
  * 
  * Contains methods for hashing passwords, comparing passwords, etc...
- * 
- * It's an abstract class, so it should be extended to use your database tables & fields
- * 
+ *  * 
  * @copyright 21-Jun-2013
  * @package DuckFusion
  * @version 1

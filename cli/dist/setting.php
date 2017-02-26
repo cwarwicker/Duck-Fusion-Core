@@ -1,6 +1,6 @@
 <?php
 
-namespace DF\%ns%;
+namespace DF\App\%ns%;
 
 /**
  * Setting class

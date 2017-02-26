@@ -8,7 +8,7 @@
  * @version 1
  * @author Conn Warwicker <conn@cmrwarwicker.com>
  */
-namespace DF\%ns%;
+namespace DF\App\%ns%;
 
 class IndexTemplate extends \DF\Template {
 

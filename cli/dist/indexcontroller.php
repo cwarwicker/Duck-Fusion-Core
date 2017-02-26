@@ -9,7 +9,7 @@
  * @author Conn Warwicker <conn@cmrwarwicker.com>
  */
 
-namespace DF\%ns%;
+namespace DF\App\%ns%;
 
 class IndexController extends \DF\Controller {
     

@@ -25,7 +25,7 @@ abstract class Controller {
     // Look at this authentication thing - don't know if it really does anything yet
     protected $requireAuthentication = false;
 
-    public function __construct($module, $controller, $params = false) {
+    public function __construct($module, $params = false) {
         
         global $cfg, $User;
                 
@@ -45,11 +45,10 @@ abstract class Controller {
             }
             
         }
-               
-        
+                       
         $this->module = $module;
-        $this->controller = $controller;
-        
+        $this->controller = $this->getShortName();
+                
         // If there are models to load, load them
         if (!empty($this->models)){
             foreach($this->models as $model){
@@ -71,16 +70,17 @@ abstract class Controller {
         // Work out where the template is - /views/IndexTemplate or in a module/views/WhateverTemplate
         $Template = array();
         $Template['Name'] = $this->controller;
-        $Template['Class'] = "\\DF\\" . df_APP . "\\".ucfirst($Template['Name']) . 'Template';
         
         if ($this->module){
+            $Template['Class'] = "\\DF\\App\\" . df_APP . "\\". $module . "\\" . ucfirst($Template['Name']) . 'Template';
             $Template['Path'] = df_APP_ROOT . df_DS . 'modules' . df_DS . $this->module . df_DS . 'views' . df_DS;
         } else {
+            $Template['Class'] = "\\DF\\App\\" . df_APP . "\\".ucfirst($Template['Name']) . 'Template';
             $Template['Path'] = df_APP_ROOT . df_DS . 'views' . df_DS;
         }
 
         $Template['Path'] = $Template['Path'] . ucfirst($Template['Name']).'Template.php';
-                
+                        
         try {
             if(file_exists($Template['Path']))
             {
@@ -102,6 +102,21 @@ abstract class Controller {
                 
     }
     
+    /**
+     * Get the name of the controller, without "Controller" on the end
+     * @return type
+     */
+    protected function getShortName(){
+        
+        $className = get_class($this);
+        $explode = explode("\\", $className);
+        $className = array_pop($explode);
+        $pos = strrpos($className, 'Controller');
+        $className = substr_replace($className, "", $pos, strlen('Controller'));
+        return $className;
+        
+    }
+    
     public function setAction($action){
         $action = str_replace('-', '_', $action);
         $this->action = $action;
@@ -119,13 +134,7 @@ abstract class Controller {
      * Run the controller
      */
     public function run(){
-                                             
-        // If POST is not empty, let's see if this action has a post method. It's up to you in that specific method to decide whether or not you then want to clear the cache for this action & params
-        // You probably will want to, but i'm not going to force you
-        if (!empty($_POST) && $this->action){
-            $this->loadAction($this->action.'_post', $this->params);
-        }
-                
+                                            
         // If this action was cached, tried to find it
         if ($this->action && array_key_exists($this->action, $this->cache)){
             $this->loadHelper( array("Cache") );
@@ -136,9 +145,7 @@ abstract class Controller {
                 exit;
             }
         }
-        
-        
-        
+                
         // if there is an action, let's try and do that before we load any template
         if ($this->action){
             $this->loadAction($this->action, $this->params);
@@ -147,12 +154,15 @@ abstract class Controller {
     }
     
     protected function loadAction($action, $params){
-        
+                
+        // If the method exists, try to call it - Should do a debug message if it doesn't exist
         if (method_exists($this, $action)){
             call_user_func( array($this, $action), $params);
         }
         
-        if ($this->template) $this->template->loadAction($action, $params);
+        if ($this->template){
+            $this->template->loadAction($action, $params);
+        }
         
         // if we want to cache this action, cache it
         if (array_key_exists($action, $this->cache)){

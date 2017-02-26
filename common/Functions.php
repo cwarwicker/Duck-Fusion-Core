@@ -57,145 +57,59 @@ function df_string($string, $app = false, $language='en'){
 
 function df_callRouting($URL = null){
     
-    // Require router for this application
-    $namespace = "DF\\" . df_APP . "\\";
-    $routerClass = "{$namespace}Router";
-    $routerFile = df_APP_ROOT . df_DS . 'config' . df_DS . 'Router.php';
+    // Default variables
+    $controller = false;
+    $action = false;
+    $arguments = false;
+    
+    // Create router object
+    $Router = new \DF\Router();
+    $Router->setNamespace('DF\\App\\' . df_APP . '\\');
+    
+    // Load any application-defined routes
+    $routerFile = df_APP_ROOT . df_DS . 'config' . df_DS . 'Routes.php';
     if (!include_once($routerFile)){
         throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $routerFile);
         df_stop();
     }
     
-    // Router
-    $Router = new $routerClass();
+    $resolve = $Router->route( array(
+        'uri' => $_SERVER['REQUEST_URI'],
+        'method' => $_SERVER['REQUEST_METHOD']
+    ) );
     
-    // Example we are going to use for comments is: mysite.com/reports/report/view/1
-    
-    $queryString = array();
-    $Controller = false;
-    $Control = false;
-    $Action = false;
-    $ControllerName = false;
-    $Module = false;
-    
-    // If URL is null or empty, use the defaults
-    if (is_null($URL) || empty($URL)){
-        $ControllerName = $Router->getDefault("Controller");
-        $Action = $Router->getDefault("Action");
-        if (!$ControllerName){
-            throw new \DF\DFException(df_string('routing'), df_string('errors:defaultcontrollerundefined'), $routerFile);
+        
+        
+    // If we returned an array, then it should contain the controller and method
+    if (is_array($resolve)){
+        
+        $controller = (strlen($resolve['controller'])) ? $resolve['controller'] : false;
+        $action = (strlen($resolve['action'])) ? $resolve['action'] : false;
+        $arguments = (isset($resolve['arguments'])) ? $resolve['arguments'] : false;
+        $module = (isset($resolve['module'])) ? $resolve['module'] : false;
+        
+        try {
+            $Controller = new $controller($module);
+        } catch (\DF\DFException $e) {
+            ob_end_clean();
+            echo $e->getException();
             df_stop();
         }
-    }
-    else
-    {
         
-        // URL is defined, so first let's see if we want to route it anywhere else
-        $URL = $Router->route($URL);
-        
-        // Explode the url by "/"
-        $urlArray = array();
-        $urlArray = preg_split('@/@', $URL, null, PREG_SPLIT_NO_EMPTY);
-        
-        // First element is the module, e.g. mysite.com/module
-        $Module = array_shift($urlArray);
-
-        // If there is another element, then it's the controller, e.g. mysite.com/module/report
-        if (isset($urlArray[0])) {
-                $ControllerName = array_shift($urlArray);
-        }
-
-        // If there is another element, then it's the action, e.g. mysite.com/module/report/view
-        if (isset($urlArray[0])) {
-                $Action = array_shift($urlArray);
-        }
-
-        // Anything else must be params, e.g. mysite.com/module/report/view/1
-        $queryString = $urlArray;
-        
+    } else {
+        echo $resolve;
+        \df_stop();
     }
     
-    // The Control we are going to try and use - First we will check: app/module, so with our example this would be module "reports", controller "report", action "view", params "1"
-    // So we're looking for myapp/modules/reports/controllers/reportController->view(1)
-    $Control['Name'] = $ControllerName;
-    $Control['Class'] = $namespace . ucfirst($Control['Name']) . 'Controller';
-    $Control['Path'] = df_APP_ROOT . df_DS . 'modules' . df_DS . $Module . df_DS . 'controllers' . df_DS . ucfirst($ControllerName).'Controller.php';
-    
-    // If this doesn't exist, let's look for a default controller for this module:
-    // myapp/modules/reports/controllers/reportsController->report(view, 1) - This example doesn't make much sense, but it could be anything, e.g. mysite.com/game/stats
-    if(!file_exists($Control['Path']))
-    {
-        if ($Action){
-            array_unshift($queryString, $Action);
-        }
-        $Action = $ControllerName;
-        $Control['Name'] = $Module;
-        $Control['Class'] = $namespace . ucfirst($Control['Name']) . 'Controller';
-        $Control['Path'] = df_APP_ROOT . df_DS . 'modules' . df_DS . $Module . df_DS . 'controllers' . df_DS . ucfirst($Module).'Controller.php';
-    }
-
-    
-    // If that doesn't exist either, let's see if we have an Index defined for this module
-    if(!file_exists($Control['Path']))
-    {
-        $Control['Name'] = 'Index';
-        $Control['Class'] = $namespace . ucfirst($Control['Name']) . 'Controller';
-        $Control['Path'] = df_APP_ROOT . df_DS . 'modules' . df_DS . $Module . df_DS . 'controllers' . df_DS . ucfirst($Control['Name']).'Controller.php';
+    // If no action set, use the default "main" method
+    if ($action === false){
+        $action = 'main';
     }
     
-    // If it STILL doesn't exist, let's look for an application Index
-    if(!file_exists($Control['Path']))
-    {
-        if ($Action){
-            array_unshift($queryString, $Action);
-        }
-        $Action = $Module;
-        $Module = false;
-        $Control['Name'] = 'Index';
-        $Control['Class'] = $namespace . ucfirst($Control['Name']) . 'Controller';
-        $Control['Path'] = df_APP_ROOT . df_DS . 'controllers' . df_DS . ucfirst($Control['Name']).'Controller.php';
-    }
-    
-    
-    // If we can find it now, include that path, otherwise use the defaults
-    try {
-        if(file_exists($Control['Path']))
-        {
-            if (@include($Control['Path'])){
-                $Controller = new $Control['Class']($Module, $Control['Name']);
-            } else {
-                throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $Control['Path']);
-            }
-        }
-        else
-        {
-            if (@include($Router->getDefault('Path'))){
-                $defaultClass = $namespace . $Router->getDefault('Class');
-                $Controller = new $defaultClass($Router->getDefault('Controller'), $Router->getDefault('Controller'));
-            } else {
-                throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $Router->getDefault('Path'));
-            }
-        }
-    } catch (\DF\DFException $e){
-        ob_end_clean();
-        echo $e->getException();
-        df_stop();
-    }
-        
-    // Set action & params
-    $Params = $queryString;
-    if (count($Params) == 1){
-        $Params = $Params[0];
-    }
-    
-    // If no action at all, use default of "main"
-    if ($Action === false) $Action = 'main';
-    
-    $Controller->setAction($Action);
-    $Controller->setParams($Params);
+    $Controller->setAction($action);
+    $Controller->setParams($arguments);
     $Controller->run();
-    $Controller->getTemplate()->render();
-        
+    $Controller->getTemplate()->render();    
     
 }
 
@@ -206,30 +120,37 @@ function df_setup(){
     
     global $cfg, $db;
     
+    // Start the DF session
+    \DF\Helpers\Session::init();
+    
+        
     // If an evnrionment is set, use that, otherwise we'll assume live to be safe
     if (!isset($cfg->env)){
-    
         $cfg->env = 'live';
-        
-        switch($cfg->env)
-        {
-
-            case 'dev':
-                error_reporting(E_ALL);
-                ini_set("display_errors", 1);
-                ini_set("log_errors", 1);
-                ini_set("error_log", df_APP_ROOT . df_DS . 'tmp' . df_DS . 'logs' . df_DS . 'error.log');
-            break;
-
-            case 'live':
-            default:
-                error_reporting(0);
-                ini_set("display_errors", 0);
-                ini_set("log_errors", 0);
-            break;
-        }
-    
     }
+            
+    switch($cfg->env)
+    {
+
+        case 'dev':
+            error_reporting(E_ALL);
+            ini_set("display_errors", 1);
+            ini_set("log_errors", 1);
+            ini_set("error_log", df_APP_ROOT . df_DS . 'tmp' . df_DS . 'logs' . df_DS . 'error.log');
+
+            // Calculate how long page load takes
+            \PHP_Timer::start();
+
+        break;
+
+        case 'live':
+        default:
+            error_reporting(0);
+            ini_set("display_errors", 0);
+            ini_set("log_errors", 0);
+        break;
+    }
+    
     
     // Set headers
     if (isset($cfg->charset)){
@@ -265,8 +186,6 @@ function df_setup(){
         require_once df_APP_ROOT . df_DS . 'lib.php';
     }
     
-    // Start the DF session
-    \DF\Helpers\Session::init();
         
 }
 
@@ -536,7 +455,7 @@ function df_dump($var){
  * Unrecoverable error, or just an error we want to stop execution at
  * @param mixed $e string or DFException object
  */
-function df_error($e){
+function df_error($err, $module = 'core', $desc = ''){
         
     // Get current output content
     $content = ob_get_contents();
@@ -650,10 +569,9 @@ function df_convert_bytes_to_hr($bytes, $precision = 2)
 
 function df_convert_url(&$url){
     
-    // If URL does not contain http(s) then convert it to a full url
-    $Validate = new \DF\Helpers\ValidationField('url', $url, '');
-    $Validate->addRule( DF_VALIDATION_RULE_URL );
-    if (!$Validate->validate()){
+    $Validate = new \GUMP();
+    $Validate->validation_rules( array('url' => 'required|valid_url') );
+    if (!$Validate->run( array('url' => $url) )){
         global $cfg;
         $url = $cfg->www . '/' . $url;
     }

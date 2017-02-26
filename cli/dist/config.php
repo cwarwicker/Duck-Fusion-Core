@@ -14,6 +14,7 @@ global $cfg;
 
 $cfg = new \stdClass();
 $cfg->www = 'http://';
+$cfg->data = df_APP_ROOT . df_DS . 'data';
 $cfg->title = '%title%';
 $cfg->author = '';
 $cfg->env = 'dev'; # dev = all errors, notices, warnings, etc..., live = Nothing

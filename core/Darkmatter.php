@@ -26,6 +26,10 @@ define('df_SYS_CORE', df_SYS . 'core' . df_DS);
 //
 //ini_set("pcre.recursion_limit", df_STACK_SIZE);
 
+// Load all the vendors
+require_once df_SYS . 'lib' . df_DS . 'vendor' . df_DS . 'autoload.php';
+
+// Load all the core system files
 require_once df_SYS_CORE . 'Controller.php';
 require_once df_SYS_CORE . 'Model.php';
 require_once df_SYS_CORE . 'Quack.php';

@@ -223,7 +223,7 @@ class Template {
      * @param $args If a string, load the template of that name from the /views/ directory. If an array, 1st element should be module name and 2nd element should be view name to load from there
      */
     public function render($args = false){
-                
+                        
         if ($this->rendered){
             return false;
         }

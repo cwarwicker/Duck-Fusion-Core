@@ -1,5 +1,5 @@
 <?php
-namespace DF\%ns%;
+namespace DF\App\%ns%;
 
 class Router extends \DF\Router {
     
