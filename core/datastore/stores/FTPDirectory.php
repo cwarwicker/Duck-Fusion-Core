@@ -7,10 +7,10 @@
  */
 
 /**
- * Description of DataStore
+ * Description of FTPDirectory
  *
  * @author Conn
  */
-class DataStore {
+class FTPDirectory {
     //put your code here
 }

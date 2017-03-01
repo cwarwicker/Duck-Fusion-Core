@@ -5,6 +5,7 @@
         "raveren/kint": "1.0.10",
         "swiftmailer/swiftmailer": "v5.4.6",
         "league/event": "2.1.2",
-        "szenis/routing": "v1.1.0"
+        "szenis/routing": "v1.1.0",
+        "monolog/monolog": "1.22.0"
     }
 }

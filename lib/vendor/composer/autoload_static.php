@@ -7,8 +7,8 @@ namespace Composer\Autoload;
 class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
 {
     public static $files = array (
-        '6bc45d0537e6858fd179bdbc31d62c79' => __DIR__ . '/..' . '/raveren/kint/Kint.class.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
+        '6bc45d0537e6858fd179bdbc31d62c79' => __DIR__ . '/..' . '/raveren/kint/Kint.class.php',
         'da253f61703e9c22a5a34f228526f05a' => __DIR__ . '/..' . '/wixel/gump/gump.class.php',
     );
 
@@ -16,6 +16,14 @@ class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
         'S' => 
         array (
             'Szenis\\' => 7,
+        ),
+        'P' => 
+        array (
+            'Psr\\Log\\' => 8,
+        ),
+        'M' => 
+        array (
+            'Monolog\\' => 8,
         ),
         'L' => 
         array (
@@ -27,6 +35,14 @@ class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
         'Szenis\\' => 
         array (
             0 => __DIR__ . '/..' . '/szenis/routing/src',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
+        'Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
         'League\\Event\\' => 
         array (

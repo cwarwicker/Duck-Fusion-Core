@@ -7,5 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Szenis\\' => array($vendorDir . '/szenis/routing/src'),
+    'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
+    'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'League\\Event\\' => array($vendorDir . '/league/event/src'),
 );

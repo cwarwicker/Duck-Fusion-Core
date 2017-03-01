@@ -248,7 +248,7 @@ class Template {
         elseif (file_exists(df_APP_ROOT . df_DS . 'views' . df_DS . 'index.html')){
             $view = df_APP_ROOT . df_DS . 'views' . df_DS . 'index.html';
         } 
-                                       
+                                               
         $Quack = new \DF\Quack();
         $Quack->setVars( $this->vars );
         $Quack->render($view);

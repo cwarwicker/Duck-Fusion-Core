@@ -11,21 +11,24 @@
 
 namespace DF\Helpers;
 
-define('ARR_EXISTS_SKIP', 0); # If an element in the array already exists with that key, do nothing
-define('ARR_EXISTS_OVERWRITE', 1); # If an element in the array already exists with that key, overwrite it
-define('ARR_EXISTS_APPEND', 2); # If an element in the array already exists with that key, convert it to an array and append the new value
 
-define('ARR_USE_KEYS', 0);
-define('ARR_USE_VALS', 1);
-
-define('ARR_SORT_ASC', 'asc');
-define('ARR_SORT_DESC', 'desc');
-define('ARR_SORT_BY_VALUE', 'v');
-define('ARR_SORT_BY_KEY', 'k');
 //more
 
 abstract class Arr
 {
+    
+    const ARR_EXISTS_SKIP = 0; # If an element in the array already exists with that key, do nothing
+    const ARR_EXISTS_OVERWRITE = 1; # If an element in the array already exists with that key, overwrite it
+    const ARR_EXISTS_APPEND = 2; # If an element in the array already exists with that key, convert it to an array and append the new value
+
+    const ARR_USE_KEYS = 0;
+    const ARR_USE_VALS = 1;
+
+    const ARR_SORT_ASC = 'asc';
+    const ARR_SORT_DESC = 'desc';
+    const ARR_SORT_BY_VALUE = 'v';
+    const ARR_SORT_BY_KEY = 'k';
+    
     
     /**
      * Work out the average of all the elements in the array
@@ -230,7 +233,7 @@ abstract class Arr
      * Examples:
      * 
      *  var_dump( \DF\Helpers\Arr::add( $array, 'new', 'new one' ) );
-        var_dump( \DF\Helpers\Arr::add( $array, 'people.liz.hair', 'pink', ARR_EXISTS_APPEND ) );
+        var_dump( \DF\Helpers\Arr::add( $array, 'people.liz.hair', 'pink', self::ARR_EXISTS_APPEND ) );
         var_dump( \DF\Helpers\Arr::add( $array, 'people.conn.age', 18 ) );
         var_dump( \DF\Helpers\Arr::add( $array, 'people', 'test' ) );
         var_dump( \DF\Helpers\Arr::add( $array, 'people.conn.age', 38 ) );
@@ -239,7 +242,7 @@ abstract class Arr
      * @param type $key
      * @param type $val 
      */
-    public static function add(&$array, $key, $val = null, $flag = ARR_EXISTS_OVERWRITE){
+    public static function add(&$array, $key, $val = null, $flag = self::ARR_EXISTS_OVERWRITE){
 
         // If the value is null, then the $key is actually the value and it's not multidimensional, so just append it
         if (is_null($val)){
@@ -262,7 +265,7 @@ abstract class Arr
         // Otherwise that element must already exist, so what do we want to do with it?
         switch($flag)
         {
-            case ARR_EXISTS_APPEND:
+            case self::ARR_EXISTS_APPEND:
                 
                 // If not an array, make it into an array
                 if (!is_array($el)){
@@ -278,14 +281,14 @@ abstract class Arr
                 return $array;
                 
             break;
-            case ARR_EXISTS_OVERWRITE:
+            case self::ARR_EXISTS_OVERWRITE:
                 
                 // Just set it normally as if it didn't exist
                 self::set($array, $key, $val);
                 return $array;
                 
             break;
-            case ARR_EXISTS_SKIP:
+            case self::ARR_EXISTS_SKIP:
             default:
                 // Do nothing
                 return $array;
@@ -361,7 +364,7 @@ abstract class Arr
      * @param type $array
      * @param type $exclude 
      */
-    public static function grep($array, $exclude = array(), $flag = ARR_USE_VALS){
+    public static function grep($array, $exclude = array(), $flag = self::ARR_USE_VALS){
 
         $tmpArray = array();
         
@@ -378,14 +381,14 @@ abstract class Arr
                 {
 
                     // Key match and case insensitive
-                    case (ARR_USE_KEYS):
+                    case (self::ARR_USE_KEYS):
                         if (!in_array($k, $exclude, true)){
                             $tmpArray[$k] = $v;
                         }
                     break;
 
                     // Value match and case insensitive
-                    case (ARR_USE_VALS):
+                    case (self::ARR_USE_VALS):
                     default:
                         if (!in_array($v, $exclude, true)){
                             $tmpArray[$k] = $v;
@@ -461,7 +464,7 @@ abstract class Arr
      * @param bool $recursive todo
      * @return boolean
      */
-    public static function sort(&$array, $order, $sortBy = ARR_SORT_BY_VALUE, $recursive = false){
+    public static function sort(&$array, $order, $sortBy = self::ARR_SORT_BY_VALUE, $recursive = false){
         
         if (!is_array($array)){
            return false;
@@ -469,24 +472,24 @@ abstract class Arr
        
         switch($order)
         {
-            case ARR_SORT_ASC:
+            case self::ARR_SORT_ASC:
                 switch($sortBy)
                 {
-                    case ARR_SORT_BY_VALUE:
+                    case self::ARR_SORT_BY_VALUE:
                         asort($array, SORT_NATURAL);
                     break;
-                    case ARR_SORT_BY_KEY:
+                    case self::ARR_SORT_BY_KEY:
                         ksort($array, SORT_NATURAL);
                     break;
                 }
             break;
-            case ARR_SORT_DESC:
+            case self::ARR_SORT_DESC:
                 switch($sortBy)
                 {
-                    case ARR_SORT_BY_VALUE:
+                    case self::ARR_SORT_BY_VALUE:
                         arsort($array, SORT_NATURAL);
                     break;
-                    case ARR_SORT_BY_KEY:
+                    case self::ARR_SORT_BY_KEY:
                         krsort($array, SORT_NATURAL);
                     break;
                 }

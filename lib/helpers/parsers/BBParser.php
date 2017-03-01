@@ -1,12 +1,12 @@
 <?php
-namespace DF\Helpers;
+namespace DF\Helpers\parsers;
 
 /**
  * Description of BBParser
  *
  * @author Conn
  */
-class BBParser implements \DF\Parser {
+class BBParser implements \DF\Helpers\Parser {
    
     const BB_OPT_HTML = 'html';
     const BB_OPT_NL2BR = 'nl2br';

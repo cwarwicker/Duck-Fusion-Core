@@ -30,18 +30,10 @@ define('df_SYS_CORE', df_SYS . 'core' . df_DS);
 require_once df_SYS . 'lib' . df_DS . 'vendor' . df_DS . 'autoload.php';
 
 // Load all the core system files
-require_once df_SYS_CORE . 'Controller.php';
-require_once df_SYS_CORE . 'Model.php';
-require_once df_SYS_CORE . 'Quack.php';
-require_once df_SYS_CORE . 'Template.php';
-require_once df_SYS_CORE . 'Parser.php';
-require_once df_SYS_CORE . 'Router.php';
-require_once df_SYS_CORE . 'Exception.php';
-require_once df_SYS_CORE . 'Database.php';
-require_once df_SYS_CORE . 'App.php';
+require_once df_SYS_CORE . 'autoload.php';
 
 // Load all the Helpers
-\DF\App::loadAllHelpers();
+#\DF\App::loadAllHelpers(); // Should i load them all every time, or use autoloading or a method to just load the ones we want?
 
 require_once df_SYS . 'common'.df_DS.'Functions.php';
 

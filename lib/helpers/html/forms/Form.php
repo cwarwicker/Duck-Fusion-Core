@@ -9,7 +9,9 @@
  * @author Conn Warwicker <conn@cmrwarwicker.com>
  */
 
-namespace DF\Helpers;
+namespace DF\Helpers\html\forms;
+
+use DF\Helpers\Arr;
 
 class Form {
 
@@ -59,7 +61,7 @@ class Form {
         }
                 
         $this->attributes = array_merge($this->attributes, $options);
-        array_sort($this->attributes, ARR_SORT_ASC, ARR_SORT_BY_KEY);
+        array_sort($this->attributes, Arr::ARR_SORT_ASC, Arr::ARR_SORT_BY_KEY);
         
     }
     
@@ -122,17 +124,17 @@ class Form {
             case 'time':
             case 'url':
             case 'week':
-                $field = new \DF\Helpers\Form\Input();
+                $field = new \DF\Helpers\html\forms\Input();
                 $field->setType($type);
             break;
         
             case 'select':
-                $field = new \DF\Helpers\Form\Select();
+                $field = new \DF\Helpers\html\forms\Select();
                 $field->setOptions($options);
             break;
         
             case 'textarea':
-                $field = new \DF\Helpers\Form\Textarea();
+                $field = new \DF\Helpers\html\forms\Textarea();
             break;            
         
         }

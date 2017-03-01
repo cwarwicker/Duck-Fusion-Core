@@ -171,7 +171,7 @@ class CLI
         
         // Write files
         $this->writeConfigFile();
-        $this->writeRouterFile();
+        $this->writeRoutesFile();
         $this->writeSettingFile();
         $this->writeIndexControllerFile();
         $this->writeIndexTemplateFile();
@@ -485,20 +485,18 @@ class CLI
     }
     
     
-    private function writeRouterFile()
+    private function writeRoutesFile()
     {
         
         if ($this->app)
         {
             
-            
-            $content = file_get_contents(df_SYS . 'cli' . df_DS . 'dist' . df_DS . 'router.php');
-            $content = str_replace("%ns%", $this->ns, $content);
+            $content = file_get_contents(df_SYS . 'cli' . df_DS . 'dist' . df_DS . 'routes.php');
 
-            $file = fopen($this->dir . 'config' . df_DS . 'Router.php', 'w');
+            $file = fopen($this->dir . 'config' . df_DS . 'Routes.php', 'w');
             if (!$file)
             {
-                echo "Error: Cannot create Router file in " . $this->dir . 'config' . df_DS . "\n";
+                echo "Error: Cannot create Routes file in " . $this->dir . 'config' . df_DS . "\n";
                 exit;
             }
             
@@ -506,7 +504,7 @@ class CLI
             fwrite($file, $content);
             fclose($file);
             
-            echo "Router file created...\n";
+            echo "Routes file created...\n";
             
         }
         

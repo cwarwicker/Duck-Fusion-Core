@@ -1,6 +1,6 @@
 <?php
 
-namespace DF\Helpers\Form;
+namespace DF\Helpers\html\forms;
 
 /**
  * Description of FormElement

@@ -12,7 +12,7 @@ namespace DF;
  *
  * @author Conn Warwicker
  */
-class Quack {
+class Quack implements \DF\Helpers\Parser {
     
     private $cache = false;
     private $cache_life = 0;
@@ -397,7 +397,7 @@ class Quack {
     /**
      * Parse the content
      */
-    protected function parse($content){
+    public function parse($content){
 
         // First remove any comments
         $this->parseComments($content);
