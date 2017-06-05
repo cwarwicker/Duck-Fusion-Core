@@ -3,7 +3,7 @@ namespace DF;
 
 define('df_CLI', true);
 
-require_once '../core/Darkmatter.php';
+require_once __DIR__ . '/../core/Darkmatter.php';
 
 class CLI
 {

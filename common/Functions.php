@@ -182,6 +182,12 @@ function df_setup(){
         
     }
         
+    // If they are using composer and have a vendor/autoload.php file, automatically include that
+    if (file_exists(df_APP_ROOT . df_DS . 'vendor/autoload.php')){
+        require_once df_APP_ROOT . df_DS . 'vendor/autoload.php';
+    }
+    
+    // If they have defined a lib.php file, automatically include that
     if (file_exists(df_APP_ROOT . df_DS . 'lib.php')){
         require_once df_APP_ROOT . df_DS . 'lib.php';
     }
