@@ -43,6 +43,8 @@ interface Database {
     // Affect values
     public function escape($val); # Escapes a value if you are being a bellend and running a direct query without using PDO
     public function wrap($val); # Wrap a field/table name with database-specific syntax. E.g. MySQL: `field`, MS SQL: [field], Oracle: "field", etc... in case of fields with spaces (rare but possible)
+    public function preLimit($limit); # If the db engine has a limit before the select fields, e.g. select top 1, select first 1, apply that
+    public function postLimit($limit, $limitFrom = null); # If the db engine has a limit after the rest of the query, e.g. limit 1, apply that
     
     // Transactions
     public function start(); # Start transaction

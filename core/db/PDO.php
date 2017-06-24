@@ -14,7 +14,8 @@ namespace DF\DB;
 abstract class PDO implements \DF\Database {
 
     static $supported_dbs = array(
-        "mysql" => "MySQL"
+        "mysql" => "MySQL",
+        "firebird" => "Firebird"
     );
 
 
@@ -67,20 +68,19 @@ abstract class PDO implements \DF\Database {
     public function connect($db = false){
         
         try {
+            
             if (!$db){
-                $conn = new \PDO("{$this->driver}:host={$this->host};", $this->user, $this->pass);
+                $conn = new \PDO("{$this->driver}:host={$this->host};charset=utf8", $this->user, $this->pass);
             }
             else {
                 $this->dbname = $db;
-                $conn = new \PDO("{$this->driver}:host={$this->host};dbname={$db}", $this->user, $this->pass);
+                $conn = new \PDO("{$this->driver}:host={$this->host};dbname={$db};charset=utf8", $this->user, $this->pass);
             }
+            
             $conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $conn->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
             $this->DBC = $conn;
-            
-            $this->DBC->query("SET NAMES 'utf8';");
-            $this->DBC->query("SET CHARACTER SET 'utf8';");
-            
+                        
         } catch (\PDOException $e){
             $this->clearConnectionDetails();
             echo $e->getMessage();
@@ -231,10 +231,9 @@ abstract class PDO implements \DF\Database {
                 $sql .= "ORDER BY {$order} ";
             }
 
-            if (!is_null($limit)){
-                $sql .= "LIMIT {$limitFrom}, {$limit}";
-            }
-
+            // Apply LIMIT
+            $sql .= $this->postLimit($limit, $limitFrom);
+            
             $st = $this->DBC->prepare($sql);
             $st->execute($sqlParams);
             $this->lastSt = $st;
@@ -405,12 +404,9 @@ abstract class PDO implements \DF\Database {
                 $sql = substr($sql, 0, -4);
                 
             }
-
-
-            if (!is_null($limit)){
-                $sql .= "LIMIT {$limit}";
-            }
-                        
+ 
+            // Apply LIMIT
+            $sql .= $this->postLimit("{$limit}");
             
             $st = $this->DBC->prepare($sql);
             $st->execute($sqlParams);
@@ -429,7 +425,7 @@ abstract class PDO implements \DF\Database {
     /**
      * Insert record(s) into the database
      * @param type $table
-     * @param object $params 
+     * @param array $params 
      */
     public function insert($table, array $params){
         
@@ -465,11 +461,11 @@ abstract class PDO implements \DF\Database {
             
             $sql = substr($sql, 0, -2);
             $sql .= ") ";
-            
+                                    
             $st = $this->DBC->prepare($sql);
             $st->execute($sqlParams);
-            $this->lastSt = $st;            
-            
+            $this->lastSt = $st;     
+                        
             return $this->id();
             
         } catch (\PDOException $e){
@@ -524,10 +520,9 @@ abstract class PDO implements \DF\Database {
                 
             }
             
-            if (!is_null($limit)){
-                $sql .= "LIMIT {$limit}";
-            }
-            
+            // Apply LIMIT
+            $sql .= $this->postLimit("{$limit}");
+                        
             $st = $this->DBC->prepare($sql);
             $st->execute($sqlParams);
             $this->lastSt = $st;

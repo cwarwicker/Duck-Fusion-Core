@@ -56,7 +56,7 @@ function df_string($string, $app = false, $language='en'){
 }
 
 function df_callRouting($URL = null){
-    
+        
     // Default variables
     $controller = false;
     $action = false;
@@ -77,9 +77,8 @@ function df_callRouting($URL = null){
         'uri' => $_SERVER['REQUEST_URI'],
         'method' => $_SERVER['REQUEST_METHOD']
     ) );
-    
-        
-        
+            
+            
     // If we returned an array, then it should contain the controller and method
     if (is_array($resolve)){
         
@@ -97,15 +96,18 @@ function df_callRouting($URL = null){
         }
         
     } else {
+        
+        // If we set a route to return something, instead of redirect, just echo it out
         echo $resolve;
         \df_stop();
+        
     }
-    
+        
     // If no action set, use the default "main" method
     if ($action === false){
         $action = 'main';
     }
-    
+        
     $Controller->setAction($action);
     $Controller->setParams($arguments);
     $Controller->run();
@@ -122,7 +124,6 @@ function df_setup(){
     
     // Start the DF session
     \DF\Helpers\Session::init();
-    
         
     // If an evnrionment is set, use that, otherwise we'll assume live to be safe
     if (!isset($cfg->env)){
@@ -176,9 +177,21 @@ function df_setup(){
                     }
                     
                     // prefix
-                    if ($db && isset($cfg->db_prefix)) $db->setPrefix($cfg->db_prefix);
+                    if ($db && isset($cfg->db_prefix)){
+                        $db->setPrefix($cfg->db_prefix);
+                    }
                     
                 }
+        
+    }
+    
+    // If we have a database connection, check out Config.php file for any extras we want to load
+    if ( (isset($db) && $db) && isset($cfg->config_table) ){
+        
+        // Temporarily set the fetch mode for the this query, then reset it afterwards
+        $db->get()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_KEY_PAIR);
+        $cfg->config = $db->selectAll($cfg->config_table)->all();
+        $db->get()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
         
     }
         

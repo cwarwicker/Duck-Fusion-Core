@@ -176,6 +176,7 @@ class CLI
         $this->writeIndexControllerFile();
         $this->writeIndexTemplateFile();
         $this->writeIndexViewFile();
+        $this->write404ViewFile();
         $this->writeLangFile();
         $this->writeCssFile();
         $this->writeHtaccessFile();
@@ -398,6 +399,32 @@ class CLI
             fclose($file);
             
             echo "index.html file created...\n";
+            
+        }
+        
+    }
+    
+    private function write404ViewFile()
+    {
+        
+        if ($this->app)
+        {
+            
+            
+            $content = file_get_contents(df_SYS . 'cli' . df_DS . 'dist' . df_DS . '404.html');
+            
+            $file = fopen($this->dir . 'views' . df_DS . '404.html', 'w');
+            if (!$file)
+            {
+                echo "Error: Cannot create 404.html file in " . $this->dir . 'views' . df_DS . "\n";
+                exit;
+            }
+            
+            // Write content
+            fwrite($file, $content);
+            fclose($file);
+            
+            echo "404.html file created...\n";
             
         }
         

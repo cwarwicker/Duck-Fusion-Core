@@ -7,6 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     '2c102faa651ef8ea5874edb585946bce' => $vendorDir . '/swiftmailer/swiftmailer/lib/swift_required.php',
-    '6bc45d0537e6858fd179bdbc31d62c79' => $vendorDir . '/raveren/kint/Kint.class.php',
     'da253f61703e9c22a5a34f228526f05a' => $vendorDir . '/wixel/gump/gump.class.php',
+    '3917c79c5052b270641b5a200963dbc2' => $vendorDir . '/kint-php/kint/init.php',
 );

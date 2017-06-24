@@ -25,7 +25,7 @@ abstract class Controller {
     // Look at this authentication thing - don't know if it really does anything yet
     protected $requireAuthentication = false;
 
-    public function __construct($module, $params = false) {
+    public function __construct($module) {
         
         global $cfg, $User;
                 
@@ -117,6 +117,11 @@ abstract class Controller {
         
     }
     
+    /**
+     * Set the action
+     * @param type $action
+     * @return $this
+     */
     public function setAction($action){
         $action = str_replace('-', '_', $action);
         $this->action = $action;
@@ -124,6 +129,11 @@ abstract class Controller {
         return $this;
     }
     
+    /**
+     * Set the params to be passed into the action
+     * @param type $params
+     * @return $this
+     */
     public function setParams($params){
         $this->params = $params;
         if ($this->template) $this->template->setParams($params);
@@ -134,7 +144,14 @@ abstract class Controller {
      * Run the controller
      */
     public function run(){
-                                            
+                               
+        global $cfg;
+
+        // If the action is set, but it doesn't exist, produce an error page
+        if ($this->action && !$this->hasAction($this->action) && $this->action !== '404'){
+            \DF\Router::go($cfg->www . '/404');
+        }
+        
         // If this action was cached, tried to find it
         if ($this->action && array_key_exists($this->action, $this->cache)){
             $this->loadHelper( array("Cache") );
@@ -153,10 +170,24 @@ abstract class Controller {
         
     }
     
+    /**
+     * Check if the controller has a specific action method
+     * @param type $action
+     * @return type
+     */
+    protected function hasAction($action){
+        return method_exists($this, $action);
+    }
+    
+    /**
+     * Call the action method on the controller and on its template
+     * @param type $action
+     * @param type $params
+     */
     protected function loadAction($action, $params){
                 
         // If the method exists, try to call it - Should do a debug message if it doesn't exist
-        if (method_exists($this, $action)){
+        if ($this->hasAction($action)){
             call_user_func( array($this, $action), $params);
         }
         
@@ -195,9 +226,16 @@ abstract class Controller {
         
     }
 
+    /**
+     * Get the template object
+     * @return type
+     */
     public function getTemplate(){
         return $this->template;
     }
+    
+    
+    
         
 
 }

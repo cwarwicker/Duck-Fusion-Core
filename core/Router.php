@@ -24,9 +24,9 @@ class Router extends \Szenis\Router {
     public function route($request){
               
         $routes = $this->getRoutesByMethod($request['method']);
-        
-        $uri = trim(preg_replace('/\?.*/', '', $request['uri']), '/');
                 
+        $uri = trim(preg_replace('/\?.*/', '', $request['uri']), '/');
+                        
         foreach ($routes as $route) {
             
             $matches = array();
@@ -97,8 +97,8 @@ class Router extends \Szenis\Router {
         $action = false;
         
         // If no uri, then use the defaults
-        if ($uri == ''){
-            
+        if ($uri == '' || $uri == 'index.php'){
+                        
             // Try to include the file
             if (!include_once($this->defaults['Path'])){
                 throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $file);
@@ -111,7 +111,7 @@ class Router extends \Szenis\Router {
             return $return;
             
         } else {
-            
+                        
             // Explode the url by "/"
             $urlArray = preg_split('@/@', $uri, null, PREG_SPLIT_NO_EMPTY);
             
@@ -206,16 +206,18 @@ class Router extends \Szenis\Router {
         
     }
     
-    
+    /**
+     * Get a default value
+     * @param type $name
+     * @return type
+     */
     public function getDefault($name){
         return (isset($this->defaults[$name])) ? $this->defaults[$name] : false ;
     }
     
     /**
      * Get arguments
-     *
      * @param  array $matches
-     *
      * @return array
      */
     private function getArguments($matches)
@@ -233,6 +235,17 @@ class Router extends \Szenis\Router {
         return $arguments;
     }
     
+    /**
+     * Redirect to a URL
+     * @param type $url
+     */
+    public static function go($url){
+                        
+        ob_end_clean();
+        header('Location:'.$url);
+        df_stop(); 
+        
+    }
     
     
 }

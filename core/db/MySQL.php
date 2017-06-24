@@ -198,8 +198,18 @@ class MySQL extends \DF\DB\PDO {
         echo $disp;
         
     }
-    
-   
-    
-    
+
+    public function postLimit($limit, $limitFrom = null) {
+        if (!is_null($limit)){
+            if (!is_null($limitFrom)){
+                return " LIMIT {$limitFrom}, {$limit} ";
+            } else {
+                return " LIMIT {$limit} ";
+            }
+        }
+    }
+
+    public function preLimit($limit) {}
+
+
 }

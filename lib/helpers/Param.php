@@ -24,7 +24,7 @@ abstract class Param {
     const TYPE_FLOAT = 'float';
     const TYPE_RAW = 'raw';
     
-    public static function optional($name, $default, $type = self::TYPE_RAW){
+    public static function optional($name, $default = null, $type = self::TYPE_RAW){
         
         // Check post first, then get, otherwise return the default
         if (isset($_POST[$name])){
@@ -53,6 +53,13 @@ abstract class Param {
         
     }
     
+    /**
+     * Clean a variable, stripping out everything else which isn't expected
+     * @param type $data
+     * @param type $type
+     * @param type $trim
+     * @return type
+     */
     public static function clean($data, $type, $trim = false){
         
         switch($type)
