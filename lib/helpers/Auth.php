@@ -23,8 +23,18 @@ class Auth
     protected $usePepper = true;
     protected $method = self::DEFAULT_METHOD;
     
+    protected $db = null;
+
+
+
+
+
+
     public function __construct(){
-                
+        
+        global $db;
+        $this->db = $db;
+        
     }
     
     public function setPassword($val){
@@ -60,6 +70,104 @@ class Auth
     public function getMethod(){
         return $this->method;
     }
+    
+    public function login($ident, $password){
+        
+        global $cfg;
+        
+        // Set the password into the auth object for later use
+        $this->password = $password;
+                
+        $return = array('result' => false);
+        
+        // Check if configuration details are stored to enable us to try and authenticate
+        if (!is_null(@$cfg->config->user_table) && !is_null(@$cfg->config->user_identfield)){
+                        
+            // First see if the user exists at all
+            $uID = $this->getUID( $ident );
+            if (!$uID){
+                $return['message'] = \df_string('errors:invalidlogin');
+                return $return;
+            }
+            
+            // Get the full user record
+            $user = $this->getUser($uID);
+            
+            // Check it's not been deleted
+            if ($user->deleted != 0){
+                $return['message'] = \df_string('errors:invalidlogin');
+                return $return;
+            }
+            
+            // Set the user salt, if we have/want one
+            if ($this->salt !== false && isset($user->salt)){
+                $this->setSalt($user->salt);
+            }
+                        
+            // We know that the user exists with that ident, so now let's check if the password matches
+            if (!$this->compare($user->password)){
+                $return['message'] = \df_string('errors:invalidlogin');
+                return $return;
+            }
+            
+            // Now check if the user has been confirmed
+            if ($user->confirmed != 1){
+                $return['message'] = \df_string('errors:userunconfirmed');
+                return $return;
+            }
+            
+            // At this point, everything should be ok, so set the user in a session
+            
+                        
+        } else {
+            $return['message'] = \df_string('errors:invaliduserconfig');
+        }
+        
+        return $return;
+        
+    }
+    
+    /**
+     * Get a user record from its id
+     * @global \DF\Helpers\type $cfg
+     * @param type $id
+     * @return boolean
+     */
+    protected function getUser($id){
+        
+        global $cfg;
+        
+        $user = $this->db->select($cfg->config->user_table, array('id' => $id));
+        if (!$user){
+            return false;
+        }
+        
+        $user->_uid = $id;
+        return $user;
+        
+    }
+    
+    /**
+     * Get the id of a user record from its ident
+     * @global type $cfg
+     * @param type $ident
+     * @return type
+     */
+    protected function getUID($ident){
+        
+        global $cfg;
+        
+        $user = $this->db->select($cfg->config->user_table, array($cfg->config->user_identfield => $ident), null, 'id');
+        return ($user) ? $user->id : false;
+        
+    }
+    
+    
+    
+    
+    
+    
+    
     
     /**
      * Hashes a specified password (setPassword) with a specified algorithm (setMethod or use the default)

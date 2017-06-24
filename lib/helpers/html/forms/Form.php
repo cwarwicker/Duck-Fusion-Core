@@ -21,7 +21,7 @@ class Form {
     private $fields = array();
     
     public function __construct($id) {
-        $this->id = $id;
+        $this->id = $id . '_form';
     }
     
     public function reset(){
@@ -152,7 +152,10 @@ class Form {
         
     }
     
-    
+    /**
+     * Get the submitted data from the form, if there is any
+     * @return boolean
+     */
     public function data(){
         
         $method = $this->getMethod();
@@ -179,15 +182,32 @@ class Form {
         
     }
     
+    /**
+     * Get a specific uploaded file
+     * @param type $name
+     * @return type
+     */
     public function getFile($name){
         return (isset($_FILES[$name])) ? $_FILES[$name] : false;
     }
     
+    /**
+     * Get the method of the form
+     * @return type
+     */
     public function getMethod(){
         
         $method = (array_key_exists('method', $this->attributes)) ? strtolower($this->attributes['method']) : false;
         return $method;
         
+    }
+    
+    /**
+     * Check if everything is ok with the form - request method matches expected, and token matches
+     * @return type
+     */
+    public function ok(){
+        return ($this->isSafe() && $this->isTokenValid());
     }
     
     /**

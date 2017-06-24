@@ -73,10 +73,12 @@ $lang['errors:defaultcontrollerundefined'] = 'Default Controller is undefined.';
 $lang['errors:dirnotwritable'] = 'Cannot write to directory: %dir%';
 $lang['errors:invalidhashmethod'] = 'Invalid Hashing Algorithm';
 $lang['errors:invalidlogin'] = 'Incorrect Login Details';
+$lang['errors:invaliduserconfig'] = 'Invalid user configuration details detetced. Please ensure these are set in the config table';
 $lang['errors:filenotfound'] = 'File not found';
 $lang['errors:sessionkey'] = 'Session key must have a string value';
 $lang['errors:sessionnotstarted'] = 'Session has not been started';
 $lang['errors:uploadfail'] = 'File could not be uploaded due to unknown error';
+$lang['errors:userunconfirmed'] = 'This account has not yet been confirmed';
 
 
 

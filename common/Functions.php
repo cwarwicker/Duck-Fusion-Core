@@ -190,7 +190,7 @@ function df_setup(){
         
         // Temporarily set the fetch mode for the this query, then reset it afterwards
         $db->get()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_KEY_PAIR);
-        $cfg->config = $db->selectAll($cfg->config_table)->all();
+        $cfg->config = (object)$db->selectAll($cfg->config_table)->all();
         $db->get()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
         
     }
