@@ -77,6 +77,7 @@ $lang['errors:invaliduserconfig'] = 'Invalid user configuration details detetced
 $lang['errors:filenotfound'] = 'File not found';
 $lang['errors:sessionkey'] = 'Session key must have a string value';
 $lang['errors:sessionnotstarted'] = 'Session has not been started';
+$lang['errors:syserror'] = 'System error';
 $lang['errors:uploadfail'] = 'File could not be uploaded due to unknown error';
 $lang['errors:userunconfirmed'] = 'This account has not yet been confirmed';
 

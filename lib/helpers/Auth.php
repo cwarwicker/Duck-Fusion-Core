@@ -77,7 +77,7 @@ class Auth
         
         // Set the password into the auth object for later use
         $this->password = $password;
-                
+                        
         $return = array('result' => false);
         
         // Check if configuration details are stored to enable us to try and authenticate
@@ -103,7 +103,7 @@ class Auth
             if ($this->salt !== false && isset($user->salt)){
                 $this->setSalt($user->salt);
             }
-                        
+                                    
             // We know that the user exists with that ident, so now let's check if the password matches
             if (!$this->compare($user->password)){
                 $return['message'] = \df_string('errors:invalidlogin');
@@ -117,13 +117,33 @@ class Auth
             }
             
             // At this point, everything should be ok, so set the user in a session
+            if (!($session = $this->addSession($uID))){
+                $return['message'] = \df_string('errors:syserror');
+                return $return;
+            }
             
+            $return['session'] = $session;
+            $return['result'] = true;
                         
         } else {
             $return['message'] = \df_string('errors:invaliduserconfig');
         }
         
         return $return;
+        
+    }
+    
+    
+    
+    protected function addSession($uID){
+        
+        global $cfg;
+        
+        $key = $cfg->config->session_name . '__' . $cfg->config->site_token;
+
+
+        // Write to the actual session
+        \DF\Helpers\Session::write($key, $uID);
         
     }
     
