@@ -66,7 +66,7 @@ $lang['emailaddress'] = 'Email Address';
 $lang['error'] = 'Error';
 
 
-
+$lang['errors:config:www'] = 'Application URL not found. If you have just created this application, please edit your Config.php file with the relevant settings for your application.';
 $lang['errors:couldnotloadfile'] = 'Could not load file.';
 $lang['errors:couldnotloadclass'] = 'Could not load class.';
 $lang['errors:defaultcontrollerundefined'] = 'Default Controller is undefined.';

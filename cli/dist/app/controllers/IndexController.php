@@ -13,6 +13,8 @@ namespace DF\App\%ns%;
 
 class IndexController extends \DF\Controller {
     
-
+    public function main($args){
+        
+    }
 
 }

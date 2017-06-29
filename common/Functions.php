@@ -122,6 +122,11 @@ function df_setup(){
     
     global $cfg, $db;
     
+    // Make sure that a URL has been specified in the config
+    if (strlen($cfg->www) == 0){
+        \df_error('errors:config:www');
+    }
+    
     // Start the DF session
     \DF\Helpers\Session::init();
         

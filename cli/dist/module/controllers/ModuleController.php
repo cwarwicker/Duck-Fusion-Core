@@ -13,6 +13,8 @@ namespace DF\App\%ns%\%mod%;
 
 class %mod%Controller extends \DF\Controller {
     
-
+    public function main($args){
+        
+    }
 
 }
