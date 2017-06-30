@@ -55,6 +55,31 @@ class CLI
     }
     
     /**
+     * Get all the commands with all their possible aliases as well
+     * @return type
+     */
+    private function getAllCommands(){
+        
+        $return = array();
+        
+        foreach($this->commands as $alias => $command)
+        {
+            
+            // Set the command into the array if it's not already there
+            if (!array_key_exists($command, $return)){
+                $return[$command] = array();
+            }
+            
+            // Append the alias
+            $return[$command][] = $alias;
+            
+        }
+        
+        return $return;
+        
+    }
+    
+    /**
      * Call the command from the user input
      * @param type $command
      * @param type $param
@@ -66,16 +91,18 @@ class CLI
         
         switch($command)
         {
-            
+        
+            // List all the available commands
             case 'list-commands':
-                
-                
-                
+                $this->runListCommands();
             break;
             
+            // Create a new appplication
             case 'create-application':
                 $this->runCreateApplication($param);
             break;
+        
+            // Add a new module to an application
             case 'add-module':
                 $this->runAddModule($param);
             break;
@@ -113,12 +140,21 @@ class CLI
         return $this->getNameSpaceFromAppName($this->app);
     }
     
-    private function displayListOfCommands(){
+    /**
+     * Run the list-commands command
+     */
+    private function runListCommands(){
         
+        $commands = $this->getAllCommands();
         
+        echo "Valid commands:\n\n";
+        
+        foreach($commands as $command => $aliases)
+        {
+            echo $command . " (aliases: ".implode("|", $aliases).")\n";
+        }
         
     }
-    
    
     
     /**
@@ -127,6 +163,11 @@ class CLI
      */
     private function runCreateApplication($param){
         
+        if (!$param){
+            echo "Missing parameter\n\n";
+            \DF\CLI::displayHelp();
+        }
+        
         if (is_array($param)){
             $param = reset($param);
         }
@@ -134,8 +175,7 @@ class CLI
         // Strip any non-alphanumeric characters from name
         $app = preg_replace("/[^a-z 0-9 \-_]/i", "", $param);
         $this->app = $app;
-                
-        $this->ns = $this->getAppNameSpace();
+        $this->ns = $this->getAppNameSpace();                
             
         // Make sure directory doesn't already exist
         $dir = df_ROOT . 'app' . df_DS . $this->app . df_DS;
@@ -176,6 +216,11 @@ class CLI
      */
     private function runDeleteApplication($param){
         
+        if (!$param){
+            echo "Missing parameter\n\n";
+            \DF\CLI::displayHelp();
+        }
+        
         $this->app = (isset($param[0])) ? $param[0] : null;
         $confirmed = (isset($param[1]) && strtolower($param[1]) == '-y');
         
@@ -209,6 +254,11 @@ class CLI
      * @param type $param
      */
     private function runAddModule($param){
+                
+        if (!$param){
+            echo "Missing parameter\n\n";
+            \DF\CLI::displayHelp();
+        }
         
         $app = (isset($param[0])) ? $param[0] : false;
         $module = (isset($param[1])) ? $param[1] : false;
@@ -250,6 +300,11 @@ class CLI
      * @param type $param
      */
     private function runDeleteModule($param){
+        
+        if (!$param){
+            echo "Missing parameter\n\n";
+            \DF\CLI::displayHelp();
+        }
         
         $this->app = (isset($param[0])) ? $param[0] : null;
         $this->mod = (isset($param[1])) ? $param[1] : false;
@@ -573,26 +628,26 @@ class CLI
     
 }
 
+// Get the user input
 $action = (isset($_SERVER['argv'][1])) ? $_SERVER['argv'][1]: false;
 $param = (count($_SERVER['argv'] > 2)) ? array_slice($_SERVER['argv'], 2): false;
 
+// Check they have actually supplied an action
 if (!$action){
     echo "Missing action\n\n";
     \DF\CLI::displayHelp();
 }
 
-if (!$param){
-    echo "Missing parameter\n\n";
-    \DF\CLI::displayHelp();
-}
-
+// Build the CLI object
 $CLI = new \DF\CLI();
 
+// Make sure the command is valid
 if (!$CLI->isCommandValid($action)){
     echo "Invalid action\n\n";
-    echo "Acceptable actions:\n\n";
-    echo implode("\n", array_unique($CLI->commands));
+    echo "Type 'commands' for a list of all available commands\n\n";
     exit;
 }
 
+// Run it
 $CLI->callCommand($action, $param);
+exit;

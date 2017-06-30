@@ -45,9 +45,14 @@ function df_string($string, $app = false, $language='en'){
     
     // if the lang file exists, include it
     if (file_exists($file)){
+        
         include $file;
+        
         // If that element is set in the lang array, return it
-        if (isset($lang) && isset($lang[$string])) return $lang[$string];
+        if (isset($lang[$string])){
+            return $lang[$string];
+        }
+        
     }
     
     // Else return the string with square brackets to indicate it's missing
@@ -55,7 +60,11 @@ function df_string($string, $app = false, $language='en'){
     
 }
 
-function df_callRouting($URL = null){
+/**
+ * Route the application to where we want to go, based on the query string
+ * @throws \DF\DFException
+ */
+function df_call_routing(){
         
     // Default variables
     $controller = false;
@@ -72,12 +81,12 @@ function df_callRouting($URL = null){
         throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $routerFile);
         df_stop();
     }
-    
+
+    // Resolve the route
     $resolve = $Router->route( array(
         'uri' => $_SERVER['REQUEST_URI'],
         'method' => $_SERVER['REQUEST_METHOD']
     ) );
-            
             
     // If we returned an array, then it should contain the controller and method
     if (is_array($resolve)){
@@ -268,14 +277,6 @@ function df_empty($str){
     
 }
 
-/**
- * Redirect immediately to another url
- * @param type $url
- */
-function df_redirect($url){
-    header('Location:' . $url);
-    exit;
-}
 
 /**
  * Get which theme we are using
@@ -407,9 +408,9 @@ function df_print_page_bar($maxPages, $currentPage, $link, $formData = false, $r
             $('#{$formID}').submit();
             return false;
 
-});
-        
-</script>";
+        });
+
+        </script>";
         
     }
     
@@ -633,7 +634,7 @@ function df_convert_url(&$url){
 
 
 
-// These are the global functions you can use instead of calling static methods on the String class
+// These are the global functions you can use instead of calling static methods on the Helper classes
 
 
 /**

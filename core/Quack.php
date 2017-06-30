@@ -6,12 +6,23 @@ namespace DF;
  * 
  * Notes: 
  * 
+ * Each action's template should have a [[use:x]] at the top, telling it which actual full template file to use, with the header, footer, etc... then the content of the action tpl
+ * should be inside a [[section]] which can be [[import]]ed in the template file.
+ * 
  * 13/03/2015 - Issues with delim regexs. If we have the /U flag, then we can have multiple on same line, e.g. {echo 'sup again'} {echo 'sup now'}, but then it fucks up with double and triple delims
  *            - If we don't have the /U flag, then the other delims work, but we get a parse error if we have multiple on same line, as it's wrapping to first and last
  *            - Will leave with /U flag for now, but needs fixing
+ * 
+ * 30/06/2017 - Future possibility - Look at redoing this, so it doesn't all parse one big string, breaks it down and goes through one "token" at a time, like in the twig template engine
  *
  * @author Conn Warwicker
  */
+
+// Issues
+// - [[noparse]] doesn't work properly, if you are inside a tag and you are parsing the end of that tag, e.g. [[section:a]][[noparse]][[section:b]]hi[[endsection]][[endnoparse]][[endsection]]
+// switch case doesn't work unless first case is at the beginning of line. Any spaces or tabs cause an error. Need to strip any whitespace between them.
+
+
 class Quack implements \DF\Helpers\Parser {
     
     private $cache = false;
@@ -82,7 +93,9 @@ class Quack implements \DF\Helpers\Parser {
     
     const REGEX_COMMENT = "/\{+\*(.*?)\*\}+/";
 
-    
+    /**
+     * Construct the Quack engine object
+     */
     public function __construct() {
         
         // Cache directory in application
@@ -91,6 +104,12 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Set a variable's value
+     * @param type $var
+     * @param type $val
+     * @return $this
+     */
     public function set($var, $val){
         
         $this->vars[$var] = $val;
@@ -98,20 +117,39 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Set an array of variables
+     * @param type $vars
+     */
     public function setVars($vars){
         $this->vars = $vars;
     }
     
+    /**
+     * Set the cache directory to use
+     * @param type $dir
+     * @return $this
+     */
     public function setCacheDir($dir){
         $this->cache_dir = $dir;
         return $this;
     }
     
+    /**
+     * Set the request string
+     * @param type $str
+     * @return $this
+     */
     public function setRequestString($str){
         $this->request_string = $str;
         return $this;
     }
     
+    /**
+     * Set the caching type, to be either dynamic or static
+     * @param type $val
+     * @return $this
+     */
     public function setCaching($val){
         
         if ($val == self::CACHE_DYNAMIC || $val == self::CACHE_STATIC){
@@ -122,11 +160,20 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Set the cache lifetime
+     * @param type $val
+     * @return $this
+     */
     public function setCachingLife($val){
         $this->cache_life = $val;
         return $this;
     }
     
+    /**
+     * Get when the cache will expire
+     * @return type
+     */
     public function getCacheExpireTime(){
         
         if ($this->cache_life > 0){
@@ -218,29 +265,22 @@ class Quack implements \DF\Helpers\Parser {
         
         // First check if this is a full path to a file
         if (file_exists($view)){
-            
             // It is, so we will use that
             $file = file_get_contents($view);
-            
         } 
         
         // Next check if it is a relative path from the app directory (adding .html on as it will be left out otherwise)
         elseif ( file_exists(df_APP_ROOT . df_DS . $view . ( ( substr($view, -5, 5) != '.html' ) ? '.html' : '' ) ) ){
-            
             $file = file_get_contents(df_APP_ROOT . df_DS . $view . ( ( substr($view, -5, 5) != '.html' ) ? '.html' : '' ));
-            
         }
         
         // Next check if it's a path to a file in the app's views directory
         elseif ( file_exists(df_APP_ROOT . df_DS . 'views' . df_DS . $view . ( ( substr($view, -5, 5) != '.html' ) ? '.html' : '' ) ) ){
-            
             $file = file_get_contents(df_APP_ROOT . df_DS . 'views' . df_DS . $view . ( ( substr($view, -5, 5) != '.html' ) ? '.html' : '' ));
-            
         }
         
         // Otherwise we failed
-        else
-        {
+        else {
             return false;
         }
                         
@@ -254,9 +294,7 @@ class Quack implements \DF\Helpers\Parser {
             
             // Is it a cached file?
             if (isset($result['cached'])){
-                
                 $this->serve($result['cached']);
-                
             }
             
             // No, it's just a tmp file
@@ -291,6 +329,11 @@ class Quack implements \DF\Helpers\Parser {
                 
     }
     
+    /**
+     * Save contents to a file location
+     * @param type $content
+     * @param type $location
+     */
     protected function saveFile($content, $location){
         
         // The PHP file to use
@@ -303,6 +346,11 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Save the rendered content either to a cache, if caching is enabled, or to a tmp file for including
+     * @param type $content
+     * @return string
+     */
     protected function save($content){
         
         $return = array();
@@ -382,6 +430,11 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Get the contents of an included script
+     * @param type $____script
+     * @return type
+     */
     protected function getScriptOutput($____script){
         
         ob_start();
@@ -399,10 +452,8 @@ class Quack implements \DF\Helpers\Parser {
      */
     public function parse($content){
 
-        // First remove any comments
-        $this->parseComments($content);
-        
-        // Then parse for any sections to be taken out and put elsewhere
+                
+        // Parse for any sections to be taken out and put elsewhere
         $this->parseSection($content);
         
         // Then parse for a layout to use
@@ -410,6 +461,9 @@ class Quack implements \DF\Helpers\Parser {
         
         // Then parse for the import of those sections elsewhere in the template
         $this->parseImport($content);
+        
+        // Remove any comments
+        $this->parseComments($content);
         
         // Then remove any elements we don't want to parse, so we can add them back in as they were at the end
         $this->parseNoParse($content);
@@ -476,6 +530,10 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Parse any comments in the template, so they are are ignored
+     * @param type $content
+     */
     protected function parseComments(&$content){
         
         // Check for a layout
@@ -495,6 +553,10 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Parse the [[use:x]] tag and include the relevant tpl file to be used
+     * @param type $content
+     */
     protected function parseUse(&$content){
                 
         // Check for a layout
@@ -542,6 +604,10 @@ class Quack implements \DF\Helpers\Parser {
                         
     }
     
+    /**
+     * Parse the [[import:x]] tag and replace with the relevant section
+     * @param type $content
+     */
     protected function parseImport(&$content){
                        
         if (preg_match_all(self::REGEX_IMPORT, $content, $matches)){
@@ -614,6 +680,10 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Parse an if statement
+     * @param type $content
+     */
     protected function parseIf(&$content){
         
         if (preg_match_all(self::REGEX_IF, $content, $matches)){
@@ -634,6 +704,10 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Parse the end of an if statement
+     * @param type $content
+     */
     protected function parseEndIf(&$content){
         
         if (preg_match_all(self::REGEX_ENDIF, $content, $matches)){
@@ -652,6 +726,10 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Parse an elseif statement
+     * @param type $content
+     */
     protected function parseElseIf(&$content){
         
         if (preg_match_all(self::REGEX_ELSEIF, $content, $matches)){
@@ -672,6 +750,10 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Parse an else statement
+     * @param type $content
+     */
     protected function parseElse(&$content){
         
         if (preg_match_all(self::REGEX_ELSE, $content, $matches)){
@@ -832,8 +914,11 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
-    
-     protected function parseFor(&$content){
+    /**
+     * Convert a @for to a php for statement
+     * @param type $content
+     */
+    protected function parseFor(&$content){
         
         if (preg_match_all(self::REGEX_FOR, $content, $matches)){
             
@@ -853,6 +938,10 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Parse an @endfor to a php endfor statement
+     * @param type $content
+     */
     protected function parseEndFor(&$content){
         
         if (preg_match_all(self::REGEX_ENDFOR, $content, $matches)){
@@ -871,6 +960,10 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Parse a @while to a php while statement
+     * @param type $content
+     */
     protected function parseWhile(&$content){
         
         if (preg_match_all(self::REGEX_WHILE, $content, $matches)){
@@ -892,7 +985,7 @@ class Quack implements \DF\Helpers\Parser {
     }
     
     /**
-     * Convert a @endwhile toa  php endwhile
+     * Convert a @endwhile to a php endwhile
      * @param type $content
      */
     protected function parseEndWhile(&$content){
@@ -1250,6 +1343,12 @@ class Quack implements \DF\Helpers\Parser {
         
     }
     
+    /**
+     * Apply any extra modifiers to data from the single/double/triple delim output
+     * @param type $mod
+     * @param type $txt
+     * @param type $options
+     */
     protected function applyModifier($mod, &$txt, $options = false){
                                 
         switch ($mod)
@@ -1472,8 +1571,6 @@ class Quack implements \DF\Helpers\Parser {
                 
                 
             break;
-            
-            
             
             
             case 'func':

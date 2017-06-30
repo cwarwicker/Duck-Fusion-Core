@@ -14,8 +14,7 @@ namespace DF\DB;
 abstract class PDO implements \DF\Database {
 
     static $supported_dbs = array(
-        "mysql" => "MySQL",
-        "firebird" => "Firebird"
+        "mysql" => "MySQL"
     );
 
 
@@ -67,14 +66,17 @@ abstract class PDO implements \DF\Database {
      */
     public function connect($db = false){
         
+        global $cfg;
+        
         try {
             
+            // If we haven't specified a database name
             if (!$db){
-                $conn = new \PDO("{$this->driver}:host={$this->host};charset=utf8", $this->user, $this->pass);
+                $conn = new \PDO("{$this->driver}:host={$this->host};charset={$cfg->charset}", $this->user, $this->pass);
             }
             else {
                 $this->dbname = $db;
-                $conn = new \PDO("{$this->driver}:host={$this->host};dbname={$db};charset=utf8", $this->user, $this->pass);
+                $conn = new \PDO("{$this->driver}:host={$this->host};dbname={$db};charset={$cfg->charset}", $this->user, $this->pass);
             }
             
             $conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);

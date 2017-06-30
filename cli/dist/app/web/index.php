@@ -25,7 +25,7 @@ df_setup();
 
 // Call the router to work out where we are going
 try {
-    df_callRouting($URL);
+    df_call_routing($URL);
 } catch (\DF\DFException $e){
     echo $e->getException();
 }

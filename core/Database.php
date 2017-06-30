@@ -74,7 +74,11 @@ interface Database {
 
 
 
-
+/**
+ * RecordSet class
+ * 
+ * Results from DB queries will be put into a RecordSet, which can then be traversed
+ */
 class Recordset {
     
     private $data;
@@ -129,10 +133,5 @@ class Recordset {
     }
     
 }
-
-// Include all DB classes
-//foreach( glob(df_SYS_CORE . "db/*.php") as $file ){
-//    include_once $file;
-//}
 
 include_once df_SYS_CORE . 'db' . df_DS . 'PDO.php';

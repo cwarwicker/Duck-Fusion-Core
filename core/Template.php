@@ -169,28 +169,6 @@ class Template {
         }
     }
     
-    /**
-     * Load a helper file
-     * @param mixed $helper 
-     */
-    protected function loadHelper($helper){
-        
-        if (is_array($helper)){
-            foreach($helper as $help){
-                $this->loadHelper($help);
-            }
-        } else {
-            $class = "\\DF\\Helpers\\{$helper}";
-            $reflection = new \ReflectionClass( $class );
-            if (!$reflection->isAbstract()){
-                $this->$helper = new $class();
-                return $this->$helper;
-            } else {
-                // debug log - abstract so cannot load into controller
-            }
-        }
-        
-    }
     
     /**
      * Based on the module, action, etc... in the url, work out which view file we think needs to be loaded
@@ -234,20 +212,9 @@ class Template {
         if ($this->setFile && file_exists(df_APP_ROOT . df_DS . $this->setFile)){
             $view = df_APP_ROOT . df_DS . $this->setFile;
             $this->setFile = false;
+        } else {
+            $view = $this->getAutomatedView();
         }
-        
-        // Main files. If we are in a module, look there first
-        elseif ($this->module && $this->action && file_exists(df_APP_ROOT . df_DS . 'modules' . df_DS . $this->module . df_DS . 'views' . df_DS . $this->action . '.html')){
-            $view = df_APP_ROOT . df_DS . 'modules' . df_DS . $this->module . df_DS . 'views' . df_DS . $this->action . '.html';
-        }
-        // If we're not in a module, look at the site level for this action
-        elseif ($this->action && file_exists(df_APP_ROOT . df_DS . 'views' . df_DS . $this->action . '.html')){
-            $view = df_APP_ROOT . df_DS . 'views' . df_DS . $this->action . '.html';
-        }             
-        // Otherwise just load the site index
-        elseif (file_exists(df_APP_ROOT . df_DS . 'views' . df_DS . 'index.html')){
-            $view = df_APP_ROOT . df_DS . 'views' . df_DS . 'index.html';
-        } 
                                                
         $Quack = new \DF\Quack();
         $Quack->setVars( $this->vars );

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Main configuration file for DuckFusion
  * 
@@ -32,10 +31,8 @@ require_once df_SYS . 'lib' . df_DS . 'vendor' . df_DS . 'autoload.php';
 // Load all the core system files
 require_once df_SYS_CORE . 'autoload.php';
 
-// Load all the Helpers
-#\DF\App::loadAllHelpers(); // Should i load them all every time, or use autoloading or a method to just load the ones we want?
-
-require_once df_SYS . 'common'.df_DS.'Functions.php';
+// Load common functions which can be used across all applications
+require_once df_SYS . 'common' . df_DS . 'Functions.php';
 
 // Require files
 if (!defined('df_CLI')){

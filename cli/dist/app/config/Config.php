@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Configuration for your appllcation
+ * Configuration for your application
  * 
  * @copyright 16-Jun-2013
  * @package DuckFusion
@@ -18,7 +17,7 @@ $cfg->data = df_APP_ROOT . df_DS . 'data';
 $cfg->title = '%title%';
 $cfg->author = '';
 $cfg->env = 'dev'; # dev = all errors, notices, warnings, etc..., live = Nothing
-$cfg->charset = 'utf-8';
+$cfg->charset = 'utf8';
 
 
 // Database object

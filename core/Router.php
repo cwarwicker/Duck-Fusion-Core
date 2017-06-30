@@ -18,6 +18,9 @@ class Router extends \Szenis\Router {
     
     /**
      * Similar to the RouteResolver::resolve method, but with DF automated routes and controllers/methods integrated
+     * You can redirect to a different Controller and Action, by specifying them in a static format, as the 3rd parameter in your $Router->add call.
+     * e.g. $Router->add('/test', 'GET', 'IndexController::testmethod')
+     * Will redirect to the IndexController and the testmethod() method, and run as a normal controller/template combination
      * @param type $request
      * @return \DF\Controller $controller
      */
@@ -26,11 +29,11 @@ class Router extends \Szenis\Router {
         $routes = $this->getRoutesByMethod($request['method']);
                 
         $uri = trim(preg_replace('/\?.*/', '', $request['uri']), '/');
-                        
+                                
         foreach ($routes as $route) {
             
             $matches = array();
-
+            
             // if the requested route matches one of the defined routes
             if ($route->getUrl() === $uri || preg_match('~^'.$route->getUrl().'$~', $uri, $matches)) {
                     
@@ -54,6 +57,9 @@ class Router extends \Szenis\Router {
                     $methodName = trim($explode[1]);
                     $module = false;
                     
+                    var_dump($explode);
+                    
+                    
                     // If the controller name includes a slash, then it is in a module
                     if (strpos($controllerName, "/") !== false){
                         $ctrl = explode("/", $controllerName);
@@ -69,7 +75,7 @@ class Router extends \Szenis\Router {
                         $className = $route->getNamespace() . $controllerName;
                         $file = df_APP_ROOT . df_DS . 'controllers' . df_DS . $controllerName . '.php';                                                
                     }
-                    
+                                        
                     // Try to include the file
                     if (!include_once($file)){
                         throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $file);

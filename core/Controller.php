@@ -28,30 +28,34 @@ abstract class Controller {
     public function __construct($module) {
         
         global $cfg, $User;
-                
-        // Load session file if we can find it
-        if (file_exists(df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php')){
-            require_once df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php';
-        }
+//                
+//        // Load session file if we can find it
+//        if (file_exists(df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php')){
+//            require_once df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php';
+//        }
+//        
+//        // Do we need to be logged in to use this Controller?
+//        if ($this->requireAuthentication){
+//            
+//            // Having loaded the session file (or tried to) if we don't have a User variable now, redirect to home page
+//            if (!$User){
+//                ob_end_clean();
+//                header('Location:'.$cfg->www.'?noauth');
+//                df_stop(); 
+//            }
+//            
+//        }
         
-        // Do we need to be logged in to use this Controller?
-        if ($this->requireAuthentication){
-            
-            // Having loaded the session file (or tried to) if we don't have a User variable now, redirect to home page
-            if (!$User){
-                ob_end_clean();
-                header('Location:'.$cfg->www.'?noauth');
-                df_stop(); 
-            }
-            
-        }
+        
                        
         $this->module = $module;
         $this->controller = $this->getShortName();
                 
         // If there are models to load, load them
         if (!empty($this->models)){
+            
             foreach($this->models as $model){
+                
                 if ($this->module){
                     $file = df_APP_ROOT . df_DS . 'modules' . df_DS . $this->module . df_DS . 'models' . df_DS . $model . '.php';
                 } else {
@@ -65,6 +69,7 @@ abstract class Controller {
                 }
                 
             }
+            
         }
         
         // Work out where the template is - /views/IndexTemplate or in a module/views/WhateverTemplate
@@ -82,12 +87,9 @@ abstract class Controller {
         $Template['Path'] = $Template['Path'] . ucfirst($Template['Name']).'Template.php';
                         
         try {
-            if(file_exists($Template['Path']))
-            {
+            if(file_exists($Template['Path'])){
                 require_once($Template['Path']);
-            }
-            else
-            {
+            } else {
                 throw new \DF\DFException(df_string("template"), df_string("errors:couldnotloadfile"), $Template['Path']);
             }
         } catch(\DF\DFException $e){
@@ -125,7 +127,9 @@ abstract class Controller {
     public function setAction($action){
         $action = str_replace('-', '_', $action);
         $this->action = $action;
-        if ($this->template) $this->template->setAction($action);
+        if ($this->template){
+            $this->template->setAction($action);
+        }
         return $this;
     }
     
@@ -136,7 +140,9 @@ abstract class Controller {
      */
     public function setParams($params){
         $this->params = $params;
-        if ($this->template) $this->template->setParams($params);
+        if ($this->template){
+            $this->template->setParams($params);
+        }
         return $this;
     }
     
@@ -207,24 +213,25 @@ abstract class Controller {
      * TODO - should change to include try/catch probably
      * @param mixed $helper 
      */
-    protected function loadHelper($helper){
-        
-        if (is_array($helper)){
-            foreach($helper as $help){
-                $this->loadHelper($help);
-            }
-        } else {
-            $class = "\\DF\\Helpers\\{$helper}";
-            $reflection = new \ReflectionClass( $class );
-            if (!$reflection->isAbstract()){
-                $this->$helper = new $class();
-                return $this->$helper;
-            } else {
-                // debug log - abstract so cannot load into controller
-            }
-        }
-        
-    }
+//    Don't think i need this, as it's got the helper autoloader in the App class now
+//    protected function loadHelper($helper){
+//        
+//        if (is_array($helper)){
+//            foreach($helper as $help){
+//                $this->loadHelper($help);
+//            }
+//        } else {
+//            $class = "\\DF\\Helpers\\{$helper}";
+//            $reflection = new \ReflectionClass( $class );
+//            if (!$reflection->isAbstract()){
+//                $this->$helper = new $class();
+//                return $this->$helper;
+//            } else {
+//                // debug log - abstract so cannot load into controller
+//            }
+//        }
+//        
+//    }
 
     /**
      * Get the template object

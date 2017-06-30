@@ -13,15 +13,26 @@ namespace DF;
 
 class App {
 
+    /**
+     * Get the name of the current application
+     * @return type
+     */
     public static function name(){
         return df_APP;
     }
     
+    /**
+     * Register the loadClass method to auto load Helper classes
+     */
     public static function register()
     {
         spl_autoload_register(array('\DF\App', 'loadClass'), true);
     }
     
+    /**
+     * Automatically load Helper classes
+     * @param type $name
+     */
     public static function loadClass($name){
                 
         $namespace = dirname($name);
@@ -36,6 +47,11 @@ class App {
         
     }
     
+    /**
+     * Create a new directory within this application's 'data' directory
+     * @param type $dir
+     * @return boolean
+     */
     public static function createDataDirectory($dir){
         
         // Check for main data directory
@@ -49,7 +65,6 @@ class App {
                 return false;
             }
         }
-
 
         // Now try and make the actual dir we want
         if (!is_dir( $data . df_DS . $dir )){
@@ -68,7 +83,10 @@ class App {
     }
     
     /**
-     * Load a class from your application's "classes" directory for use
+     * Load a class from the application's 'classes' directory. Or if a module is specified, then from that module's 'models' directory
+     * @param type $class
+     * @param type $module
+     * @return boolean
      */
     public static function uses($class, $module = false){
         
@@ -83,29 +101,6 @@ class App {
         }
         
     }
-//    
-//    public static function loadAllHelpers($dir = false){
-//        
-//        // Set default helpers directory if not passed through
-//        if (!$dir){
-//            $dir = df_SYS . 'lib' . df_DS . 'helpers';
-//        }
-//                
-//        // Require all the .php filers
-//        $scan = glob($dir . df_DS . '*');
-//        
-//        foreach ($scan as $path) {
-//                                    
-//            if (preg_match('/\.php$/', $path)) {
-//                require_once $path;
-//            }
-//            elseif (is_dir($path)) {
-//                self::loadAllHelpers($path);
-//            }
-//            
-//        }
-//                
-//    }
     
     
 }

@@ -76,8 +76,5 @@ class DFException  extends \Exception{
         
     }
     
-    public function __destruct() {
-        
-    }
 
 }
