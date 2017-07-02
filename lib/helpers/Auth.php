@@ -26,10 +26,6 @@ class Auth
     protected $db = null;
 
 
-
-
-
-
     public function __construct(){
         
         global $db;
@@ -71,6 +67,13 @@ class Auth
         return $this->method;
     }
     
+    /**
+     * 
+     * @global \DF\Helpers\type $cfg
+     * @param type $ident
+     * @param type $password
+     * @return type
+     */
     public function login($ident, $password){
         
         global $cfg;
@@ -133,17 +136,27 @@ class Auth
         
     }
     
+    /**
+     * Check if the user is logged in (if the session key for this site is set)
+     * @return type
+     */
+    public function isLoggedIn(){
+        return (\DF\Helpers\Session::read( self::getSessionKey() ) !== false);
+    }
     
     
+    /**
+     * Write the session data
+     * @global \DF\Helpers\type $cfg
+     * @param type $uID
+     * @return type
+     */
     protected function addSession($uID){
-        
-        global $cfg;
-        
-        $key = $cfg->config->session_name . '__' . $cfg->config->site_token;
-
+                
+        $key = self::getSessionKey();
 
         // Write to the actual session
-        \DF\Helpers\Session::write($key, $uID);
+        return \DF\Helpers\Session::write($key, $uID);
         
     }
     
@@ -181,13 +194,6 @@ class Auth
         return ($user) ? $user->id : false;
         
     }
-    
-    
-    
-    
-    
-    
-    
     
     /**
      * Hashes a specified password (setPassword) with a specified algorithm (setMethod or use the default)
@@ -259,5 +265,17 @@ class Auth
         $this->usePepper = true;
         $this->method = self::DEFAULT_METHOD;
     }
+    
+    
+    /**
+     * Get the key used for the sessions on this site
+     * @global \DF\Helpers\type $cfg
+     * @return type
+     */
+    public static function getSessionKey(){
+        global $cfg;
+        return $cfg->config->session_name . '__' . $cfg->config->site_token;
+    }
+    
     
 }

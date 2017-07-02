@@ -17,7 +17,7 @@ $cfg->data = df_APP_ROOT . df_DS . 'data';
 $cfg->title = '%title%';
 $cfg->author = '';
 $cfg->env = 'dev'; # dev = all errors, notices, warnings, etc..., live = Nothing
-$cfg->charset = 'utf8';
+$cfg->charset = 'utf-8';
 
 
 // Database object
@@ -27,3 +27,7 @@ $cfg->db_name = '';
 $cfg->db_user = '';
 $cfg->db_pass = '';
 $cfg->db_prefix = '';
+$cfg->db_charset = 'utf8';
+
+// Extensions
+$cfg->config_table = 'config';

@@ -72,11 +72,11 @@ abstract class PDO implements \DF\Database {
             
             // If we haven't specified a database name
             if (!$db){
-                $conn = new \PDO("{$this->driver}:host={$this->host};charset={$cfg->charset}", $this->user, $this->pass);
+                $conn = new \PDO("{$this->driver}:host={$this->host};charset={$cfg->db_charset}", $this->user, $this->pass);
             }
             else {
                 $this->dbname = $db;
-                $conn = new \PDO("{$this->driver}:host={$this->host};dbname={$db};charset={$cfg->charset}", $this->user, $this->pass);
+                $conn = new \PDO("{$this->driver}:host={$this->host};dbname={$db};charset={$cfg->db_charset}", $this->user, $this->pass);
             }
             
             $conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);

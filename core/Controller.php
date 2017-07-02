@@ -10,6 +10,8 @@
 
 namespace DF;
 
+use DF\Router as Router;
+
 abstract class Controller {
     
     protected $module = false;
@@ -24,30 +26,22 @@ abstract class Controller {
     
     // Look at this authentication thing - don't know if it really does anything yet
     protected $requireAuthentication = false;
+    protected $requireAuthenticationRedirect = '';
 
     public function __construct($module) {
         
         global $cfg, $User;
-//                
-//        // Load session file if we can find it
-//        if (file_exists(df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php')){
-//            require_once df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php';
-//        }
-//        
-//        // Do we need to be logged in to use this Controller?
-//        if ($this->requireAuthentication){
-//            
-//            // Having loaded the session file (or tried to) if we don't have a User variable now, redirect to home page
-//            if (!$User){
-//                ob_end_clean();
-//                header('Location:'.$cfg->www.'?noauth');
-//                df_stop(); 
-//            }
-//            
-//        }
-        
-        
-                       
+                
+        // Do we need to be logged in to use this Controller?
+        if ($this->requireAuthentication){
+            
+            // If the $User variable is not set (which is set in the application's Session.php file), redirect
+            if (!$User){
+                Router::go($cfg->www . '/' . $this->requireAuthenticationRedirect);
+            }
+            
+        }
+                               
         $this->module = $module;
         $this->controller = $this->getShortName();
                 

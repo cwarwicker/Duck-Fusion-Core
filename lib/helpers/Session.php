@@ -32,6 +32,8 @@ class Session {
         
         $_SESSION[$key] = $value;
         
+        return $_SESSION[$key];
+        
     }
     
     public static function delete($key){

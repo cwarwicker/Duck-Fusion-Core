@@ -10,15 +10,17 @@ namespace DF\Helpers\html\forms;
 abstract class FormElement {
     
     protected $id;
+    
     public $name;
     public $value;
     public $attributes;
+    public $extras;
     
     public function __construct($id = null){
         
         // If no id specified, generate a unique one
         if (strlen($id) < 1){
-            $id = \string_rand(10);
+            $id = 'df_frm_el_' . \string_rand(10);
         }
         
         $this->id = $id;
@@ -27,6 +29,10 @@ abstract class FormElement {
     
     public function getID(){
         return $this->id;
+    }    
+    
+    public function getElementID(){
+        return (isset($this->attributes['id'])) ? $this->attributes['id'] : $this->id;
     }
     
     public function setName($name){
@@ -66,6 +72,15 @@ abstract class FormElement {
     
     public function getAttribute($key){
         return (array_key_exists($key, $this->attributes)) ? $this->attributes[$key] : null;
+    }
+    
+    public function setExtras($extras){
+        $this->extras = $extras;
+        return $this;
+    }
+    
+    public function getExtras(){
+        return $this->extras;
     }
     
 }

@@ -20,9 +20,14 @@ class Template {
     protected $parser = false;
     protected $vars = array();
     protected $breadcrumbs = array();
+    
     public $cache_output = false;
-    private $rendered = false;
+        
     protected $setFile = false;
+    
+    private $rendered = false;
+    
+    
     
     public function __construct($module = false) {
         global $cfg, $User;

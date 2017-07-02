@@ -56,9 +56,7 @@ class Router extends \Szenis\Router {
                     $controllerName = trim($explode[0]);
                     $methodName = trim($explode[1]);
                     $module = false;
-                    
-                    var_dump($explode);
-                    
+                                        
                     
                     // If the controller name includes a slash, then it is in a module
                     if (strpos($controllerName, "/") !== false){
@@ -87,7 +85,7 @@ class Router extends \Szenis\Router {
                     $return['action'] = $methodName;
                     $return['module'] = $module;
                     $return['arguments'] = $arguments;
-                    
+                                        
                     return $return;
                     
                 }

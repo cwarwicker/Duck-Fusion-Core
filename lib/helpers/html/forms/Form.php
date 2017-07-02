@@ -19,9 +19,24 @@ class Form {
     private $action;
     private $attributes = array();
     private $fields = array();
+    private $options = array();
     
     public function __construct($id) {
         $this->id = $id . '_form';
+    }
+    
+    public function setOptions($options){
+        $this->options = $options;
+        return $this;
+    }
+    
+    public function addOption($opt){
+        $this->options[] = $opt;
+        return $this;
+    }
+    
+    public function getOptions(){
+        return $this->options;
     }
     
     public function reset(){
@@ -45,22 +60,23 @@ class Form {
         
     }
 
-    public function open( array $options ){
+    // Am i using this for anything???
+    public function open( array $attributes ){
                 
         // "url" key is for the action
-        if (array_key_exists('url', $options)){
-            df_convert_url($options['url']);
-            $this->action = \df_html($options['url']);
-            unset($options['url']);
+        if (array_key_exists('url', $attributes)){
+            df_convert_url($attributes['url']);
+            $this->action = \df_html($attributes['url']);
+            unset($attributes['url']);
         }
         
         // "files" key is to enable file uploads
-        if (array_key_exists('files', $options) && $options['files'] === true){
+        if (array_key_exists('files', $attributes) && $attributes['files'] === true){
             $this->attributes['enctype'] = 'multipart/form-data';
-            unset($options['files']);
+            unset($attributes['files']);
         }
                 
-        $this->attributes = array_merge($this->attributes, $options);
+        $this->attributes = array_merge($this->attributes, $attributes);
         array_sort($this->attributes, Arr::ARR_SORT_ASC, Arr::ARR_SORT_BY_KEY);
         
     }
@@ -94,11 +110,11 @@ class Form {
         
     }
     
-    public function add($type, $name, $value = null, $attributes = null, $options = null){
+    public function add($type, $name, $value = null, $attributes = null, $options = null, $extras = array()){
         
         $type = strtolower( trim($type) );
         $field = false;
-                
+                        
         switch($type)
         {
             case 'hidden':
@@ -145,6 +161,7 @@ class Form {
             $field->setName($name);
             $field->setValue($value);
             $field->setAttributes($attributes);
+            $field->setExtras( array_merge($this->options, $extras) );
             $this->fields[] = $field;
         }
         
@@ -179,6 +196,18 @@ class Form {
         }
         
         return false;
+        
+    }
+    
+    /**
+     * Get an element from the submitted data, by its name
+     * @param type $name
+     * @return type
+     */
+    public function get($name){
+        
+        $data = $this->data();
+        return (isset($data[$name])) ? $data[$name] : null;
         
     }
     

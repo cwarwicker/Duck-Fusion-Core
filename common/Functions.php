@@ -219,6 +219,11 @@ function df_setup(){
         require_once df_APP_ROOT . df_DS . 'lib.php';
     }
     
+    // Load the session if its set
+    if (file_exists(df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php')){
+        global $User;
+        require_once df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php';
+    }
         
 }
 

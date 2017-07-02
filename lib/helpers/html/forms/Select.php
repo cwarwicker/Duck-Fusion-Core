@@ -27,6 +27,10 @@ class Select extends FormElement {
     
     public function render(){
 
+        if (is_null($this->attributes) || !$this->attributes){
+            $this->attributes = array();
+        }
+        
         $output = "";
         
         $name = ( ($key = array_search('multiple', $this->attributes)) !== false && $this->attributes[$key]) ? "{$this->name}[]" : $this->name;
@@ -47,9 +51,31 @@ class Select extends FormElement {
         }
         
         $output .= "</select>";
+        
+        if (isset($this->extras['bootstrap']) && $this->extras['bootstrap'] == true){
+            $output = $this->applyBootstrap($output);
+        }
                 
         return $output;
         
     }
+    
+    
+    
+    protected function applyBootstrap($content){
+        
+        $output = "";
+        
+        $output .= "<div class='form-group'>";
+            if (isset($this->extras['label'])){
+                $output .= "<label for='{$this->getElementID()}'>{$this->extras['label']}</label>";
+            }
+        $output .= $content;
+        $output .= "</div>";
+
+        return $output;
+        
+    }
+    
     
 }

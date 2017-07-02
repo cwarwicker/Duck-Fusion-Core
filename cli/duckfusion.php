@@ -171,7 +171,7 @@ class CLI
         if (is_array($param)){
             $param = reset($param);
         }
-        
+                
         // Strip any non-alphanumeric characters from name
         $app = preg_replace("/[^a-z 0-9 \-_]/i", "", $param);
         $this->app = $app;
@@ -206,7 +206,8 @@ class CLI
         $this->writeLangFile();
         $this->writeConfigFile();
         
-        echo "Application ({$this->app}) successfully created!\n\n";
+        echo "Application ({$this->app}) successfully created!\n";
+        echo "Remember to update the configuration values in your Config.php file!\n\n";
         
     }
     
