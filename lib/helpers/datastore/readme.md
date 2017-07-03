@@ -10,8 +10,19 @@ e.g.
     $ds = new \DF\Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'data');
     $file = $ds->find('myfile.txt');
     if ($file){
+        // This will move "myfile.txt" into the data/sub/folder directory (if it exists)
         $file->move('sub/folder');
     }
+```
+
+If the directory you are moving/copying to does not exist, you can use the DataStore `forceCreate()` method to make it create those directories, otherwise it will return false
+
+e.g.
+
+```php
+    $ds = new \DF\Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'data');
+    $ds->forceCreate();
+    ...
 ```
 
 ## Switching DataStore directories
@@ -25,8 +36,10 @@ e.g.
     $ds = new \DF\Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'tmp');
     $file = $ds->find('tmpfile.txt');
     if ($file){
+        // This changes the DataStore's working directory to the 'data' folder in your application
         $ds->change(df_APP_ROOT . df_DS . 'data');
-        $file->move('', 'newname.txt');
+        // This moves the file to the DataStore's working directory, keeping the name the same
+        $file->move();
     }
 ```
 
