@@ -1,8 +1,8 @@
 <?php
 
-namespace DF\datastore;
+namespace DF\Helpers\datastore;
 
-use DF\datastore\exception\FileException;
+use DF\Helpers\datastore\exception\FileException;
 
 /**
  * Description of File
@@ -11,8 +11,22 @@ use DF\datastore\exception\FileException;
  */
 abstract class File {
     
+    /**
+     * Path to the file
+     * @var type 
+     */
     protected $file;
     
+    /**
+     * DataStore object we found this file in
+     * @var type 
+     */
+    protected $store;
+    
+    /**
+     * Construct the File object
+     * @param type $file
+     */
     public function __construct($file) {
         $this->file = $file;
     }
@@ -25,7 +39,6 @@ abstract class File {
     abstract public function exists();
     abstract public function readable();
     abstract public function writable();
-    abstract public static function touch($target, $createDirs = true);
     
     /**
      * Returns the full path to the file
@@ -98,7 +111,6 @@ abstract class File {
         return $time;
     }
     
-    
     /**
      * Gets last access time.
      * 
@@ -111,8 +123,22 @@ abstract class File {
         return $time;
     }
     
+    /**
+     * Set the DataStore reference
+     * @param type $store
+     * @return $this
+     */
+    public function setStore($store){
+        $this->store = $store;
+        return $this;
+    }
     
-    
-    
+    /**
+     * Get the DataStore reference
+     * @return type
+     */
+    public function getStore(){
+        return $this->store;
+    }
     
 }
