@@ -11,11 +11,7 @@ use DF\Helpers\datastore\files\LocalFile;
  */
 class LocalDirectory extends \DF\Helpers\datastore\DataStore {
         
-    /**
-     * The working directory
-     * @var type 
-     */
-    protected $dir;
+    
     
     /**
      * Construct the LocalDirectory DataStore object
@@ -62,11 +58,15 @@ class LocalDirectory extends \DF\Helpers\datastore\DataStore {
      */
     public function find($path) {
         
+        $this->tmpNoMake = true;
+        
         // Check the path is ok
         $filepath = $this->ok($path);
         if (!$filepath){
             return false;
         }
+        
+        $this->tmpNoMake = false;
         
         $file = new LocalFile($filepath);
         $file->setStore($this);
@@ -121,7 +121,13 @@ class LocalDirectory extends \DF\Helpers\datastore\DataStore {
      * @return type
      */
     protected function makeDir($path){
+        
+        if ($this->tmpNoMake){
+            return false;
+        }
+        
         return mkdir($path, $this->chmod, true);
+        
     }
         
      /**
@@ -138,7 +144,7 @@ class LocalDirectory extends \DF\Helpers\datastore\DataStore {
         $dirpath = ($realpath) ? dirname($realpath) : dirname($file);
         $chkpath = ($realpath) ? $realpath : $dirpath;
                                 
-        // Can't use realpath here as the file doesn't exist, so will just have to compare the paths and return false if any double dots are found
+        // Can't always use realpath here as the file doesn't exist, so will just have to compare the paths and return false if any double dots are found
         if (strpos($chkpath, $this->dir) !== 0 || strpos($chkpath, '..') !== false){
             return false;
         } 
@@ -156,5 +162,23 @@ class LocalDirectory extends \DF\Helpers\datastore\DataStore {
         return $file;
         
     }
+
+    /**
+     * Get a recursive array of all the directories and files within the working directory
+     * @return type
+     */
+    public function listAll() {
     
+        $directory = new \RecursiveDirectoryIterator($this->dir, \RecursiveDirectoryIterator::SKIP_DOTS);
+        $iterator = new \RecursiveIteratorIterator($directory, \RecursiveIteratorIterator::SELF_FIRST);
+        $files = array();
+        
+        foreach($iterator as $path => $dir){
+            $files[] = $path;
+        }
+        
+        return $files;
+        
+    }
+
 }

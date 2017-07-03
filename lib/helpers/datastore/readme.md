@@ -59,7 +59,7 @@ e.g.
     }
 ```
 
-## Handling File Uploaded
+## Handling File Uploads
 
 If you are handling a file upload, you can manually create the File object instead of calling the `find()` method on the DataStore, then you can apply the DataStore to it afterwards in order to make use of the relevant methods
 

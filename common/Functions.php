@@ -494,7 +494,9 @@ function df_error($err, $module = 'core', $desc = ''){
     ob_end_clean();
     
     // Print the error page
-    echo "TODO - df_error";
+    echo "TODO - df_error<br>";
+    echo $err;
+    
     
     
     // Stop

@@ -9,6 +9,66 @@ namespace DF\Helpers\datastore\files;
 class LocalFile extends \DF\Helpers\datastore\File {
        
     /**
+     * Get the permissions of the file
+     * @return int
+     */
+    public function getPermissions(){
+        return fileperms($this->file);
+    }
+    
+    /**
+     * Get the owner of the file
+     * @return int Owner ID or FALSE
+     */
+    public function getOwner(){
+        return fileowner($this->file);
+    }
+    
+    /**
+     * Returns the group of the file
+     * @return int Group ID or FALSE
+     */
+    public function getGroup(){
+        return filegroup($this->file);
+    }
+    
+    /**
+     * Get the modified date
+     * @return \DateTime
+     */
+    public function getModified(){
+        $timestamp = filemtime($this->file);
+        $time = new \DateTime();
+        $time->setTimestamp($timestamp);
+        return $time;
+    }
+    
+    /**
+     * Gets the created time.
+     *
+     * @return DateTime
+     */
+    public function getCreated() {
+        $timestamp = filectime($this->file);
+        $time = new \DateTime();
+        $time->setTimestamp($timestamp);
+        return $time;
+    }
+    
+    /**
+     * Gets last access time.
+     * 
+     * @return DateTime
+     */
+    public function getLastAccessed() {
+        $timestamp = fileatime($this->file);
+        $time = new \DateTime();
+        $time->setTimestamp($timestamp);
+        return $time;
+    }
+    
+    
+    /**
      * Check to see if the file exists
      * @return bool
      */

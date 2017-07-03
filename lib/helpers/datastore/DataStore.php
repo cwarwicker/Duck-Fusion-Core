@@ -14,6 +14,18 @@ use DF\Helpers\datastore\exception\DataStoreException;
 abstract class DataStore {
     
     /**
+     * The working directory
+     * @var type 
+     */
+    protected $dir;
+    
+    /**
+     * Temporary variable to override the makeDir method, when checking if a path is ok()
+     * @var type 
+     */
+    protected $tmpNoMake = false;
+    
+    /**
      * If you want to lock to finding files only inside this specific directory and no sub directories, set this to true with lock()
      * @var bool
      */
@@ -75,8 +87,11 @@ abstract class DataStore {
     
     abstract protected function connect($params);
     abstract protected function disconnect();
+    abstract protected function makeDir($path);
     abstract public function change($params);
     abstract public function find($path);
+    abstract public function listAll();
+    abstract public function ok($file);
     abstract public function touch($path);
     
 }
