@@ -7,7 +7,7 @@ Firstly load up the DataStore we are looking in, then find the file(s) you want 
 e.g.
 
 ```php
-    $ds = new \DF\Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'data');
+    $ds = new \DF\Helpers\datastore\stores\LocalStore(df_APP_ROOT . df_DS . 'data');
     $file = $ds->find('myfile.txt');
     if ($file){
         // This will move "myfile.txt" into the data/sub/folder directory (if it exists)
@@ -20,7 +20,7 @@ If the directory you are moving/copying to does not exist, you can use the DataS
 e.g.
 
 ```php
-    $ds = new \DF\Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'data');
+    $ds = new \DF\Helpers\datastore\stores\LocalStore(df_APP_ROOT . df_DS . 'data');
     $ds->forceCreate();
     ...
 ```
@@ -33,7 +33,7 @@ This is a security feature which stops people being able to delete/copy/move/etc
 e.g.
 
 ```php
-    $ds = new \DF\Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'tmp');
+    $ds = new \DF\Helpers\datastore\stores\LocalStore(df_APP_ROOT . df_DS . 'tmp');
     $file = $ds->find('tmpfile.txt');
     if ($file){
         // This changes the DataStore's working directory to the 'data' folder in your application
@@ -50,7 +50,7 @@ If you don't even want them to be able to do anything in the sub directories of 
 e.g.
 
 ```php
-    $ds = new \DF\Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'data');
+    $ds = new \DF\Helpers\datastore\stores\LocalStore(df_APP_ROOT . df_DS . 'data');
     $ds->lock();
     $file = $ds->find('myfile.txt');
     if ($file){
@@ -66,7 +66,7 @@ If you are handling a file upload, you can manually create the File object inste
 e.g.
 
 ```php
-    $ds = new \DF\Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'tmp');
+    $ds = new \DF\Helpers\datastore\stores\LocalStore(df_APP_ROOT . df_DS . 'tmp');
     $file = new \DF\Helpers\datastore\files\LocalFile($_FILES['myfile']['tmp_name']);
     $file->setStore($ds);
     // This will move the temporary file to the DataStore's working directory and rename it with the actual filename of the uploaded file

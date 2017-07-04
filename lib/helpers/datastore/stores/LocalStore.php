@@ -9,12 +9,12 @@ use DF\Helpers\datastore\files\LocalFile;
  *
  * @author Conn
  */
-class LocalDirectory extends \DF\Helpers\datastore\DataStore {
+class LocalStore extends \DF\Helpers\datastore\DataStore {
         
     
     
     /**
-     * Construct the LocalDirectory DataStore object
+     * Construct the LocalStore DataStore object
      * @param type $params
      */
     public function __construct($params) {
@@ -36,7 +36,14 @@ class LocalDirectory extends \DF\Helpers\datastore\DataStore {
      * @return type
      */
     protected function connect($params) {
+        
+        // Make sure path 
+        if (!is_dir($params)){
+            $this->makeDir($params);
+        }
+        
         return (is_dir($params));
+        
     }
 
     /**
@@ -79,10 +86,10 @@ class LocalDirectory extends \DF\Helpers\datastore\DataStore {
      * @param type $path
      * @return type
      */
-    public function touch($path) {
+    public function touch($path, $overwrite = false) {
         
         // If it already exists, just return it
-        $file = $this->find($path);
+        $file = (!$overwrite) ? $this->find($path) : false;
         if ($file){
             return $file;
         } else {
@@ -153,7 +160,7 @@ class LocalDirectory extends \DF\Helpers\datastore\DataStore {
         if ($this->locked && $dirpath !== $this->dir ){
             return false;
         }
-        
+                
         // If the directory itself does not exist, return false, unless we have forceCreate enabled, then we can try and create it first
         if (!is_dir($dirpath) && !$this->makeDir($dirpath)){
             return false;

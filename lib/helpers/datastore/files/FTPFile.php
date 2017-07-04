@@ -58,9 +58,7 @@ class FTPFile extends \DF\Helpers\datastore\File {
      * @return type
      */
     public function move($target = '', $newName = false, $failOnExist = false) {
-        
-        
-        
+                
     }
 
     /**
@@ -70,8 +68,8 @@ class FTPFile extends \DF\Helpers\datastore\File {
     public function read() {
         
         ob_start();
-        $result = ftp_get($this->store->conn, "php://output", $this->file, FTP_BINARY);
-        $data = ob_get_contents();
+            ftp_get($this->store->conn, "php://output", $this->file, FTP_BINARY);
+            $data = ob_get_contents();
         ob_end_clean();
         
         return $data;
@@ -87,9 +85,24 @@ class FTPFile extends \DF\Helpers\datastore\File {
         
     }
 
-    public function download(\DF\Helpers\datastore\stores\LocalDirectory $local){
+    /**
+     * Try and download a remote file into a LocalStore
+     * @param \DF\Helpers\datastore\stores\LocalStore $store
+     * @param type $newName
+     * @return boolean
+     */
+    public function download(\DF\Helpers\datastore\stores\LocalStore $store, $newName = false){
                 
+        $filename = ($newName) ? $newName : $this->getFileName();
+        $filepath = $store->ok($filename);
+        if ($filepath){
+            return ftp_get($this->store->conn, $filepath, $this->file, FTP_BINARY);
+        }
+        
+        return false;
+        
     }
+    
     
     /**
      * Get the last modified date of the file

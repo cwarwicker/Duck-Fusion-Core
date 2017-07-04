@@ -4,7 +4,7 @@ namespace DF\Helpers\datastore\stores;
 
 use DF\Helpers\datastore\files\FTPFile;
 
-class FTPDirectory extends \DF\Helpers\datastore\DataStore {
+class FTPStore extends \DF\Helpers\datastore\DataStore {
         
     /**
      * Connection resource
@@ -100,6 +100,12 @@ class FTPDirectory extends \DF\Helpers\datastore\DataStore {
         return ($file->exists()) ? $file : false;
         
     }
+    
+    public function upload(\DF\Helpers\datastore\stores\LocalStore $store, $newName = false){
+        
+        
+        
+    }
 
     public function touch($path) {
         
@@ -123,12 +129,16 @@ class FTPDirectory extends \DF\Helpers\datastore\DataStore {
      */
     public function ok($file){
         
-        $file = $this->dir . '/' . $file;
+        $file = rtrim($this->dir, '/') . '/' . $file;
         $realpath = realpath($file);
         
         $dirpath = ($realpath) ? dirname($realpath) : dirname($file);
         $chkpath = ($realpath) ? $realpath : $dirpath;
-                
+        
+        // Replace backslashes with forward slashes to avoid conflicts where the server sets the dir to '/' but the dirname() function uses '\'
+        $dirpath = str_replace('\\', '/', $dirpath);
+        $chkpath = str_replace('\\', '/', $chkpath);
+                        
         // Can't always use realpath here as the file doesn't exist, so will just have to compare the paths and return false if any double dots are found
         if (strpos($chkpath, $this->dir) !== 0 || strpos($chkpath, '..') !== false){
             return false;

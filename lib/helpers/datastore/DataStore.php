@@ -3,7 +3,7 @@
 
 namespace DF\Helpers\datastore;
 
-use DF\Helpers\datastore\stores\LocalDirectory;
+use DF\Helpers\datastore\stores\LocalStore;
 use DF\Helpers\datastore\exception\DataStoreException;
 
 /**
