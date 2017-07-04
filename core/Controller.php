@@ -35,7 +35,7 @@ abstract class Controller {
         // Do we need to be logged in to use this Controller?
         if ($this->requireAuthentication){
             
-            // If the $User variable is not set (which is set in the application's Session.php file), redirect
+            // If the $User variable is not set (which should be set in the application's Session.php file), redirect
             if (!$User){
                 Router::go($cfg->www . '/' . $this->requireAuthenticationRedirect);
             }
@@ -152,21 +152,10 @@ abstract class Controller {
             \DF\Router::go($cfg->www . '/404');
         }
         
-        // If this action was cached, tried to find it
-        if ($this->action && array_key_exists($this->action, $this->cache)){
-            $this->loadHelper( array("Cache") );
-            $cache = $this->Cache->findCache($this->module, $this->controller, $this->action, $this->params, $this->cache[$this->action]);
-            // If the cache exists and it's not expired, display that instead
-            if ($cache){
-                echo $cache;
-                exit;
-            }
-        }
-                
         // if there is an action, let's try and do that before we load any template
         if ($this->action){
             $this->loadAction($this->action, $this->params);
-        }
+        }              
         
     }
     
@@ -196,7 +185,8 @@ abstract class Controller {
         }
         
         // if we want to cache this action, cache it
-        if (array_key_exists($action, $this->cache)){
+        if (array_key_exists($action, $this->cache) && array_key_exists('life', $this->cache[$action])){
+            $this->template->cache = $this->cache[$action];
             $this->template->cache_output = true;
         }
         

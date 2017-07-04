@@ -7,6 +7,6 @@
         "league/event": "2.1.2",
         "szenis/routing": "v1.1.0",
         "monolog/monolog": "1.22.0",
-        "leafo/lessphp" : "0.4.0"
+        "filp/whoops" : "2.1.9"
     }
 }

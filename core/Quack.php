@@ -192,7 +192,7 @@ class Quack implements \DF\Helpers\Parser {
     public function render($view){
                         
         $now = time();
-        
+                                
         // Get current URL string
         if ($this->cache && $this->cache_dir && $this->request_string){
             
@@ -406,7 +406,6 @@ class Quack implements \DF\Helpers\Parser {
                 $obj->time = time();
                 $obj->expires = $this->getCacheExpireTime();
                 $this->saveFile(json_encode($obj), $this->cache_dir . $jsonFile);
-                
                 
             }
 

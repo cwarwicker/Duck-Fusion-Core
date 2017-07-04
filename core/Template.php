@@ -21,8 +21,9 @@ class Template {
     protected $vars = array();
     protected $breadcrumbs = array();
     
+    public $cache = array();
     public $cache_output = false;
-        
+
     protected $setFile = false;
     
     private $rendered = false;
@@ -220,18 +221,19 @@ class Template {
         } else {
             $view = $this->getAutomatedView();
         }
-                                               
+                                                       
         $Quack = new \DF\Quack();
         $Quack->setVars( $this->vars );
-        $Quack->render($view);
+        $Quack->setRequestString($this->getRequestString());
                 
-        // Cache
+        // Cache this action if we are using Cache
         if ($this->cache_output){
-            $this->loadHelper( array("Cache") );
-            // Cache this action
-            \DF\Helpers\Cache::cache($this->module, $this->controller, $this->action, $this->params, ob_get_contents());
+            $Quack->setCaching( (isset($this->cache['type'])) ? $this->cache['type'] : Quack::CACHE_DYNAMIC );
+            $Quack->setCachingLife($this->cache['life']);
         }
 
+        $Quack->render($view);
+        
         return true;        
                 
     }

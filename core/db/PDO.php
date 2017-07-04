@@ -85,8 +85,7 @@ abstract class PDO implements \DF\Database {
                         
         } catch (\PDOException $e){
             $this->clearConnectionDetails();
-            echo $e->getMessage();
-            return false;
+            throw $e;
         }
         
         // Clear connection details - don't need them any more

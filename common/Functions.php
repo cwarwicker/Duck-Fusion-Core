@@ -160,9 +160,10 @@ function df_setup(){
 
         case 'live':
         default:
-            error_reporting(0);
+            error_reporting(E_ALL);
             ini_set("display_errors", 0);
-            ini_set("log_errors", 0);
+            ini_set("log_errors", 1);
+            ini_set("error_log", df_APP_ROOT . df_DS . 'tmp' . df_DS . 'logs' . df_DS . 'error.log');
         break;
     }
     
@@ -171,6 +172,20 @@ function df_setup(){
     if (isset($cfg->charset)){
         header('Content-Type: text/html; charset='.$cfg->charset);
     }
+    
+    
+    // If they are using composer and have a vendor/autoload.php file, automatically include that
+    if (file_exists(df_APP_ROOT . df_DS . 'vendor/autoload.php')){
+        require_once df_APP_ROOT . df_DS . 'vendor/autoload.php';
+    }
+    
+    // Register Error Handler
+    if ($cfg->env == 'dev' && class_exists('\Whoops\Run')){
+        $whoops = new \Whoops\Run();
+        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
+        $whoops->register();
+    }
+    
             
     // If database info is set, let's create a global db object
     if ( isset($cfg->db_driver) && !empty($cfg->db_driver) 
@@ -209,10 +224,7 @@ function df_setup(){
         
     }
         
-    // If they are using composer and have a vendor/autoload.php file, automatically include that
-    if (file_exists(df_APP_ROOT . df_DS . 'vendor/autoload.php')){
-        require_once df_APP_ROOT . df_DS . 'vendor/autoload.php';
-    }
+    
     
     // If they have defined a lib.php file, automatically include that
     if (file_exists(df_APP_ROOT . df_DS . 'lib.php')){
@@ -471,7 +483,7 @@ function df_get_file_extension($filename){
 }
 
 /**
- * Dump var
+ * Dump variable
  * @param type $var
  */
 function df_dump($var){
@@ -485,18 +497,15 @@ function df_dump($var){
  * Unrecoverable error, or just an error we want to stop execution at
  * @param mixed $e string or DFException object
  */
-function df_error($err, $module = 'core', $desc = ''){
+function df_error($error){
         
+    global $cfg;
+    
     // Get current output content
     $content = ob_get_contents();
     
     // Clear all output
     ob_end_clean();
-    
-    // Print the error page
-    echo "TODO - df_error<br>";
-    echo $err;
-    
     
     
     // Stop
@@ -789,7 +798,7 @@ function array_last(array $array, Closure $function, $default = false){
  * @param type $key
  * @param type $val 
  */
-function array_add(&$array, $key, $val = null, $flag = ARR_EXISTS_SKIP){
+function array_add(&$array, $key, $val = null, $flag = \DF\Helpers\Arr::ARR_EXISTS_SKIP){
     return \DF\Helpers\Arr::add($array, $key, $val, $flag);
 }
 
@@ -807,21 +816,21 @@ function array_split(&$array, $recursive = false){
  * @param type $array
  * @param type $exclude 
  */
-function array_grep($array, $exclude = array(), $flag = ARR_USE_VALS){
+function array_grep($array, $exclude = array(), $flag = \DF\Helpers\Arr::ARR_USE_VALS){
     return \DF\Helpers\Arr::grep($array, $exclude, $flag);
 }
 
 
-
 /**
- * Flatten a multidimensional array into a single array
- * http://stackoverflow.com/questions/6785355/convert-multidimensional-array-into-single-array
+ * Flatten a multi-dimensional array into a single dimensional array
  * @param type $array
+ * @param type $glue
+ * @param type $reset
  * @return boolean
  */
-function array_flatten($array) { 
-    return \DF\Helpers\Arr::flatten($array);
-} 
+function array_flatten($array, $glue = '', $reset = true){
+    return \DF\Helpers\Arr::flatten($array, $glue, $reset);
+}
 
 /**
  * Check if an array is multidimensional
@@ -839,6 +848,17 @@ function array_is_multi($array){
  * @param type $recursive
  * @return type
  */
-function array_sort(&$array, $order, $sortBy = ARR_SORT_BY_VALUE, $recursive = false){
+function array_sort(&$array, $order, $sortBy = \DF\Helpers\Arr::ARR_SORT_BY_VALUE, $recursive = false){
     return \DF\Helpers\Arr::sort($array, $order, $sortBy, $recursive);
+}
+
+/**
+ * Set a specific dot-notation element to a value and return the parent element
+ * @param type $array
+ * @param type $key
+ * @param type $val
+ * @return type
+ */
+function array_set(&$array, $key, $val){
+    return \DF\Helpers\Arr::set($array, $key, $val);
 }

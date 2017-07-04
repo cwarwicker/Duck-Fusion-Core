@@ -191,7 +191,8 @@ abstract class Arr
 
 
     /**
-     * Get the first element in the array to pass the callback test
+     * Get the first element in the array to pass the callback test.
+     * The callback requires both $key and $val arguments
      * If none pass it, you can use a default parameter to return that as the default value
      * @param type $array
      * @param type $function
@@ -220,9 +221,7 @@ abstract class Arr
      * @param type $default
      */
     public static function last(array $array, \Closure $function, $default = false){
-
         return self::first( array_reverse($array), $function, $default );
-
     }
 
 
@@ -265,6 +264,7 @@ abstract class Arr
         // Otherwise that element must already exist, so what do we want to do with it?
         switch($flag)
         {
+            
             case self::ARR_EXISTS_APPEND:
                 
                 // If not an array, make it into an array
@@ -281,6 +281,7 @@ abstract class Arr
                 return $array;
                 
             break;
+            
             case self::ARR_EXISTS_OVERWRITE:
                 
                 // Just set it normally as if it didn't exist
@@ -288,17 +289,20 @@ abstract class Arr
                 return $array;
                 
             break;
+        
             case self::ARR_EXISTS_SKIP:
             default:
                 // Do nothing
                 return $array;
             break;
+        
         }
         
     }
     
     /**
      * Set a given element within an array to a specific value, using dot notation to move down through the sub elements of the keys
+     * It's essentially the same as doing an Arr::add($array, $key, $val, Arr::ARR_EXISTS_OVERWRITE) except it returns the parent of the element you updated, instead of the whole array
      * @param type $array
      * @param type $key
      * @param type $val
@@ -408,38 +412,56 @@ abstract class Arr
 
     }
 
-
     /**
-     * Flatten a multidimensional array into a single array
-     * http://stackoverflow.com/questions/6785355/convert-multidimensional-array-into-single-array
+     * Flatten a multi-dimensional array into a single dimensional array
+     * @staticvar array $return
+     * @staticvar array $curr_key
      * @param type $array
+     * @param type $glue
+     * @param type $reset
      * @return boolean
      */
-    public static function flatten($array) { 
+    public static function flatten($array, $glue = '', $reset = true) { 
 
-        if (!is_array($array)) { 
-            return false; 
-        } 
-        
-        $result = array(); 
-        
-        foreach ($array as $key => $value) { 
-            
-            if (is_array($value)) { 
-                $arrayList = self::flatten($value);
-                foreach ($arrayList as $listItem) {
-                    $result[] = $listItem; 
+        if (!is_array($array)){
+            return false;
+        }
+
+        static $return = array();
+        static $curr_key = array();
+
+        if ($reset){
+            $return = array();
+            $curr_key = null;
+        }
+
+        $isGluing = (strlen($glue) > 0);
+
+        foreach($array as $key => $val){
+
+            $curr_key[] = $key;
+
+            // If the element itself is an array, flatten that first
+            if (is_array($val)){
+                self::flatten($val, $glue, false);
+            } else {
+
+                // If we have specified a glue string, use that along with all the keys so far as the key, otherwise just append numerically
+                if ($isGluing){
+                    $return[implode($glue, $curr_key)] = $val;
+                } else {
+                    $return[] = $val;
                 }
-            } 
-            else { 
-                $result[$key] = $value; 
-            } 
-            
-        } 
-        
-        return $result; 
 
-    } 
+            }
+
+            array_pop($curr_key);
+
+        }
+
+        return $return;
+
+    }
 
     /**
      * Check if an array is multidimensional
@@ -461,10 +483,10 @@ abstract class Arr
      * Sort an array in a given direction
      * @param type $array
      * @param type $order
-     * @param bool $recursive todo
+     * @param type $sortBy ARR_SORT_BY_VALUE or ARR_SORT_BY_KEY
      * @return boolean
      */
-    public static function sort(&$array, $order, $sortBy = self::ARR_SORT_BY_VALUE, $recursive = false){
+    public static function sort(&$array, $order, $sortBy = self::ARR_SORT_BY_VALUE){
         
         if (!is_array($array)){
            return false;
@@ -497,6 +519,7 @@ abstract class Arr
             
         }
        
+        return $array;
         
     }
     

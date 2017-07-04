@@ -102,5 +102,40 @@ class App {
         
     }
     
+    /**
+     * Rubbish Collection
+     * Delete any files in /tmp or /tmp/cache which are older than the specified max lifetime
+     * @param type $maxLife Default: 3600 seconds
+     * @return type
+     */
+    public static function rc($maxLife = 3600){
+        
+        // Timestamp
+        $max = time() - $maxLife;
+        
+        // Count
+        $cnt = 0;
+        
+        // Go through all the files in the app's 'tmp' directory and the 'tmp/cache' directory and delete any which were created longer ago than the maxLife
+        $ds = new Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'tmp');
+        $ds->lock();
+        
+        $files = $ds->listAll(true);
+        if ($files)
+        {
+            foreach($files as $file)
+            {
+                // If the file is older than the max lifetime, delete it
+                if ($file->getModified()->format('U') < $max)
+                {
+                    $cnt += (int)$file->delete();
+                }
+            }
+        }
+        
+        return $cnt;
+        
+    }
+    
     
 }

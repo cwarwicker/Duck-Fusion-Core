@@ -13,6 +13,10 @@ class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
     );
 
     public static $prefixLengthsPsr4 = array (
+        'W' => 
+        array (
+            'Whoops\\' => 7,
+        ),
         'S' => 
         array (
             'Szenis\\' => 7,
@@ -32,6 +36,10 @@ class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
     );
 
     public static $prefixDirsPsr4 = array (
+        'Whoops\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/filp/whoops/src/Whoops',
+        ),
         'Szenis\\' => 
         array (
             0 => __DIR__ . '/..' . '/szenis/routing/src',
@@ -129,11 +137,6 @@ class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
         'Kint_Renderer_Text_Trace' => __DIR__ . '/..' . '/kint-php/kint/src/Renderer/Text/Trace.php',
         'Kint_SourceParser' => __DIR__ . '/..' . '/kint-php/kint/src/SourceParser.php',
         'PHP_Timer' => __DIR__ . '/..' . '/phpunit/php-timer/src/Timer.php',
-        'lessc' => __DIR__ . '/..' . '/leafo/lessphp/lessc.inc.php',
-        'lessc_formatter_classic' => __DIR__ . '/..' . '/leafo/lessphp/lessc.inc.php',
-        'lessc_formatter_compressed' => __DIR__ . '/..' . '/leafo/lessphp/lessc.inc.php',
-        'lessc_formatter_lessjs' => __DIR__ . '/..' . '/leafo/lessphp/lessc.inc.php',
-        'lessc_parser' => __DIR__ . '/..' . '/leafo/lessphp/lessc.inc.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

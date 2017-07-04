@@ -450,46 +450,66 @@
         ]
     },
     {
-        "name": "leafo/lessphp",
-        "version": "v0.4.0",
-        "version_normalized": "0.4.0.0",
+        "name": "filp/whoops",
+        "version": "2.1.9",
+        "version_normalized": "2.1.9.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/leafo/lessphp.git",
-            "reference": "51f3f06f0fe78a722dabfd14578444bdd078d9de"
+            "url": "https://github.com/filp/whoops.git",
+            "reference": "b238974e1c7cc1859b0c16ddc1c02ecb70ecc07f"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/leafo/lessphp/zipball/51f3f06f0fe78a722dabfd14578444bdd078d9de",
-            "reference": "51f3f06f0fe78a722dabfd14578444bdd078d9de",
+            "url": "https://api.github.com/repos/filp/whoops/zipball/b238974e1c7cc1859b0c16ddc1c02ecb70ecc07f",
+            "reference": "b238974e1c7cc1859b0c16ddc1c02ecb70ecc07f",
             "shasum": ""
         },
-        "time": "2013-08-09T17:09:19+00:00",
+        "require": {
+            "php": "^5.5.9 || ^7.0",
+            "psr/log": "^1.0.1"
+        },
+        "require-dev": {
+            "mockery/mockery": "0.9.*",
+            "phpunit/phpunit": "^4.8 || ^5.0",
+            "symfony/var-dumper": "^2.6 || ^3.0"
+        },
+        "suggest": {
+            "symfony/var-dumper": "Pretty print complex values better with var-dumper available",
+            "whoops/soap": "Formats errors as SOAP responses"
+        },
+        "time": "2017-06-03T18:33:07+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "0.3-dev"
+                "dev-master": "2.0-dev"
             }
         },
         "installation-source": "dist",
         "autoload": {
-            "classmap": [
-                "lessc.inc.php"
-            ]
+            "psr-4": {
+                "Whoops\\": "src/Whoops/"
+            }
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
-            "MIT",
-            "GPL-3.0"
+            "MIT"
         ],
         "authors": [
             {
-                "name": "Leaf Corcoran",
-                "email": "leafot@gmail.com",
-                "homepage": "http://leafo.net"
+                "name": "Filipe Dobreira",
+                "homepage": "https://github.com/filp",
+                "role": "Developer"
             }
         ],
-        "description": "lessphp is a compiler for LESS written in PHP.",
-        "homepage": "http://leafo.net/lessphp/"
+        "description": "php error handling for cool kids",
+        "homepage": "https://filp.github.io/whoops/",
+        "keywords": [
+            "error",
+            "exception",
+            "handling",
+            "library",
+            "whoops",
+            "zf2"
+        ]
     }
 ]

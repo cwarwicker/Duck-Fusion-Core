@@ -81,7 +81,7 @@ $lang['errors:syserror'] = 'System error';
 $lang['errors:uploadfail'] = 'File could not be uploaded due to unknown error';
 $lang['errors:userunconfirmed'] = 'This account has not yet been confirmed';
 
-
+$lang['errorpage:title'] = 'Whoops! An error has occurred.';
 
 $lang['exception'] = 'Exception';
 $lang['expected'] = 'Expected';

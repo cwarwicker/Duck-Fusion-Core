@@ -167,14 +167,32 @@ class LocalDirectory extends \DF\Helpers\datastore\DataStore {
      * Get a recursive array of all the directories and files within the working directory
      * @return type
      */
-    public function listAll() {
+    public function listAll($objects = false) {
     
-        $directory = new \RecursiveDirectoryIterator($this->dir, \RecursiveDirectoryIterator::SKIP_DOTS);
-        $iterator = new \RecursiveIteratorIterator($directory, \RecursiveIteratorIterator::SELF_FIRST);
         $files = array();
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->dir, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
         
-        foreach($iterator as $path => $dir){
-            $files[] = $path;
+        // Are we locked to this directory only?
+        if ($this->locked){
+            
+            $directory = new \RecursiveDirectoryIterator($this->dir, \RecursiveDirectoryIterator::SKIP_DOTS);
+            $iterator = new \RecursiveIteratorIterator($directory, \RecursiveIteratorIterator::SELF_FIRST);
+            
+            foreach($iterator as $file){
+                
+                // Only get files that are directly inside the working directory
+                if (!$file->isDir() && $file->getPath() == $this->dir){
+                    $files[] = ($objects) ? $this->find($file->getFilename()) : $file->getRealPath();
+                }                
+                
+            }
+            
+        } else {
+        
+            foreach($iterator as $file){
+                $files[] = ($objects) ? $this->find($file->getFilename()) : $file->getRealPath();
+            }
+
         }
         
         return $files;
