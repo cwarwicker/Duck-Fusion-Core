@@ -26,6 +26,7 @@ class FTPStore extends \DF\Helpers\datastore\DataStore {
         $pass = (isset($params['pass'])) ? $params['pass'] : false;
         $port = (isset($params['port'])) ? $params['port'] : 21;
         $dir  = (isset($params['dir']))  ? $params['dir']  : '';
+        $pasv = (isset($params['pasv']) && $params['pasv']);
         
         // If no host, just stop
         if (!$host){
@@ -46,8 +47,11 @@ class FTPStore extends \DF\Helpers\datastore\DataStore {
             return false;
         }
         
+        // Passive mode on or off
+        ftp_pasv(($this->conn), $pasv);
+        
         // Switch to the requested directory
-        if ($dir != '' && !ftp_chdir($this->conn, $dir)){
+        if ($dir != '' && !@ftp_chdir($this->conn, $dir)){
             return false;
         }
 
@@ -73,7 +77,7 @@ class FTPStore extends \DF\Helpers\datastore\DataStore {
      */
     public function change($params) {
         
-        if (!ftp_chdir($this->conn, $params)){
+        if (!@ftp_chdir($this->conn, $params)){
             return false;
         } else {
             $this->dir = ftp_pwd($this->conn);
@@ -87,13 +91,18 @@ class FTPStore extends \DF\Helpers\datastore\DataStore {
      * @param type $path
      */
     public function find($path) {
-                
+                        
+        $this->tmpNoMake = true;
+
         // Check the path is ok
         $filepath = $this->ok($path);
         if (!$filepath){
+            $this->tmpNoMake = false;
             return false;
         }
-                
+
+        $this->tmpNoMake = false;
+
         $file = new FTPFile($filepath);
         $file->setStore($this);
         
@@ -101,13 +110,76 @@ class FTPStore extends \DF\Helpers\datastore\DataStore {
         
     }
     
-    public function upload(\DF\Helpers\datastore\stores\LocalStore $store, $newName = false){
-        
-        
+    /**
+     * Upload a file to the FTP Store
+     * @param \DF\Helpers\datastore\File $file
+     * @param type $newName
+     * @return type
+     */
+    public function upload(\DF\Helpers\datastore\files\LocalFile $file, $newName = false){
+                
+        $filename = (($newName) ? $newName : $file->getFileName());
+            
+        // Change to that directory?
+        $split = explode("/", $filename);
+        $realFileName = array_pop($split);
+        $filedir = $this->dir . '/' . implode("/", $split);
+
+        if (!@ftp_chdir($this->conn, $filedir)){
+            return false;
+        };           
+            
+        $result = ftp_put($this->conn, $realFileName, $file->getFullPath(), FTP_BINARY);
+        return ($result) ? $this->find($filename) : false;
         
     }
 
-    public function touch($path) {
+    /**
+     * Find or create a file
+     * @param type $path
+     * @return type
+     */
+    public function touch($path, $overwrite = false) {
+        
+        // If it already exists, just return it
+        $file = (!$overwrite) ? $this->find($path) : false;
+        if ($file){
+            return $file;
+        } else {
+            return $this->make($path);
+        }
+        
+    }
+    
+    /**
+     * Create a file
+     * @param type $path
+     * @return boolean
+     */
+    protected function make($path){
+               
+        global $cfg;
+        
+        // Check the path is ok
+        $filepath = $this->ok($path);
+        if (!$filepath){
+            return false;
+        }
+        
+        // Create a tmp blank file in the LocalStore to be uploaded with the specified name, as we can't directly "make" a file on the remote server
+        $ds = new LocalStore($cfg->tmp);
+        $filename = 'tmp-' . string_rand(10);
+        $file = $ds->touch($filename);
+        if (!$file) {
+            return false;
+        }
+                
+        $result = $this->upload($file, $path);        
+        
+        // Delete tmp file
+        $file->delete();
+        
+        return $result;
         
     }
 
@@ -149,8 +221,16 @@ class FTPStore extends \DF\Helpers\datastore\DataStore {
             return false;
         }
         
+        // See if we can switch to this directory (only real way of checking if it exists, as an ftp_nlist returns an empty array which could mean it exists and is empty)
+        $dirExists = @ftp_chdir($this->conn, $dirpath);
+        
+        // Switch back
+        if ($dirExists){
+            ftp_chdir($this->conn, $this->dir);
+        }
+        
         // If the directory itself does not exist, return false, unless we have forceCreate enabled, then we can try and create it first
-        if (ftp_nlist($this->conn, $dirpath) === false && !$this->makeDir($dirpath)){
+        if (!$dirExists && !$this->makeDir($dirpath)){
             return false;
         }
         
@@ -158,7 +238,47 @@ class FTPStore extends \DF\Helpers\datastore\DataStore {
         
     }
 
+    /**
+     * Make a new directory on the FTP server
+     * @param type $path
+     * @return boolean
+     */
     protected function makeDir($path) {
+        
+        if ($this->tmpNoMake){
+            return false;
+        }
+                
+        // Split the path by directories and try and create all of them if they don't exist
+        $workingDir = $this->dir;
+        $newPath = str_replace($this->dir, "", $path);
+        $split = array_filter( explode("/", $newPath) );
+        
+        if ($split)
+        {
+            foreach($split as $dir)
+            {
+                
+                // Can we change to it?
+                if (!@ftp_chdir($this->conn, $workingDir . '/' . $dir)){
+                    
+                    // Try and make the directory
+                    if (!@ftp_mkdir($this->conn, $workingDir . '/' . $dir)){
+                        return false;
+                    }
+                    
+                    // Set the permissions to the default
+                    $this->chmod = 0777;
+                    @ftp_chmod($this->conn, $this->chmod, $workingDir . '/' . $dir);
+                    
+                }
+                
+                $workingDir .= '/' . $dir;
+                
+            }
+        }
+
+        return true;
         
     }
 

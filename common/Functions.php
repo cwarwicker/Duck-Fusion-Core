@@ -482,16 +482,6 @@ function df_get_file_extension($filename){
     
 }
 
-/**
- * Dump variable
- * @param type $var
- */
-function df_dump($var){
-    
-    var_dump($var);
-    echo "<hr>";
-    
-}
 
 /**
  * Unrecoverable error, or just an error we want to stop execution at

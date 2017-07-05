@@ -25,11 +25,11 @@ class FTPFile extends \DF\Helpers\datastore\File {
     }
     
     /**
-     * Check to see if the file is writable by the web server
+     * Not really able to do this with FTP, so just returns null
      * @return bool
      */
     public function writable(){
-        
+        return null;
     }
     
     /**
@@ -39,7 +39,29 @@ class FTPFile extends \DF\Helpers\datastore\File {
      */
     public function copy($target, $failOnExist = false) {
         
-       
+        global $cfg;
+                
+        // Firstly make sure the target path is ok
+        $targetpath = $this->store->ok($target);
+                
+        // Then check if the target file already exists
+        $find = $this->store->find($target);
+        if ($find && $failOnExist){
+            return false;
+        }
+
+        // Then download the remote file into a temporary local file
+        $ds = new \DF\Helpers\datastore\stores\LocalStore($cfg->tmp);
+        $tmpfilename = 'tmp-' . string_rand(10);
+        $tmpfile = $this->download($ds, $tmpfilename);
+        
+        // Then upload that temp file back to the remote server in its new location
+        $result = $this->store->upload($tmpfile, $target);
+                
+        // Now delete the temp file
+        $tmpfile->delete();
+        
+        return $result;
         
     }
 
@@ -48,17 +70,25 @@ class FTPFile extends \DF\Helpers\datastore\File {
      * @return type
      */
     public function delete() {
-        
+        return ftp_delete($this->store->conn, $this->getFullPath());
     }
                 
     /**
      * Move the file to another location on the FTP server
      * @param type $target
-     * @param type $newName (Optional) new file name, otherwise existing name will be used
-     * @return type
+     * @param type $newName
+     * @param type $failOnExist
      */
     public function move($target = '', $newName = false, $failOnExist = false) {
-                
+        
+        $newPath = $target . '/' . ( ($newName) ? $newName : $this->getFileName() );
+        $result = $this->copy($newPath, $failOnExist);
+        if ($result){
+            return $this->delete();
+        } else {
+            return false;
+        }
+        
     }
 
     /**
@@ -82,7 +112,7 @@ class FTPFile extends \DF\Helpers\datastore\File {
      * @return type
      */
     public function write($data, $flags = null) {
-        
+        // TODO
     }
 
     /**
@@ -93,13 +123,15 @@ class FTPFile extends \DF\Helpers\datastore\File {
      */
     public function download(\DF\Helpers\datastore\stores\LocalStore $store, $newName = false){
                 
+        $result = false;
+        
         $filename = ($newName) ? $newName : $this->getFileName();
         $filepath = $store->ok($filename);
         if ($filepath){
-            return ftp_get($this->store->conn, $filepath, $this->file, FTP_BINARY);
+            $result = ftp_get($this->store->conn, $filepath, $this->file, FTP_BINARY);
         }
-        
-        return false;
+                
+        return ($result) ? $store->find($filename) : $result;
         
     }
     

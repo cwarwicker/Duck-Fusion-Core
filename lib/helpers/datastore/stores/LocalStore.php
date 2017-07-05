@@ -70,6 +70,7 @@ class LocalStore extends \DF\Helpers\datastore\DataStore {
         // Check the path is ok
         $filepath = $this->ok($path);
         if (!$filepath){
+            $this->tmpNoMake = false;
             return false;
         }
         

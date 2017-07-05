@@ -117,7 +117,7 @@ class App {
         $cnt = 0;
         
         // Go through all the files in the app's 'tmp' directory and the 'tmp/cache' directory and delete any which were created longer ago than the maxLife
-        $ds = new Helpers\datastore\stores\LocalDirectory(df_APP_ROOT . df_DS . 'tmp');
+        $ds = new Helpers\datastore\stores\LocalStore(df_APP_ROOT . df_DS . 'tmp');
         $ds->lock();
         
         $files = $ds->listAll(true);
