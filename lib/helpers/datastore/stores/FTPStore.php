@@ -3,6 +3,7 @@
 namespace DF\Helpers\datastore\stores;
 
 use DF\Helpers\datastore\files\FTPFile;
+use DF\Helpers\datastore\exception\DataStoreException;
 
 class FTPStore extends \DF\Helpers\datastore\DataStore {
         

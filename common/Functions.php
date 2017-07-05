@@ -77,10 +77,11 @@ function df_call_routing(){
     
     // Load any application-defined routes
     $routerFile = df_APP_ROOT . df_DS . 'config' . df_DS . 'Routes.php';
-    if (!include_once($routerFile)){
-        throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $routerFile);
-        df_stop();
+    if (!file_exists($routerFile)){
+        throw new \DF\Exceptions\FileExistException('Missing Routes.php file in /config directory.');
     }
+    
+    include_once $routerFile;
 
     // Resolve the route
     $resolve = $Router->route( array(
@@ -96,14 +97,8 @@ function df_call_routing(){
         $arguments = (isset($resolve['arguments'])) ? $resolve['arguments'] : false;
         $module = (isset($resolve['module'])) ? $resolve['module'] : false;
         
-        try {
-            $Controller = new $controller($module);
-        } catch (\DF\DFException $e) {
-            ob_end_clean();
-            echo $e->getException();
-            df_stop();
-        }
-        
+        $Controller = new $controller($module);
+               
     } else {
         
         // If we set a route to return something, instead of redirect, just echo it out

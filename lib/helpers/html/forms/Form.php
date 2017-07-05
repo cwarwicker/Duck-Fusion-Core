@@ -60,7 +60,10 @@ class Form {
         
     }
 
-    // Am i using this for anything???
+    /**
+     * This is called after the instantiation of the object, to set the attributes of the form itself, such as method and action
+     * @param array $attributes
+     */
     public function open( array $attributes ){
                 
         // "url" key is for the action
@@ -78,6 +81,8 @@ class Form {
                 
         $this->attributes = array_merge($this->attributes, $attributes);
         array_sort($this->attributes, Arr::ARR_SORT_ASC, Arr::ARR_SORT_BY_KEY);
+        
+        return $this;
         
     }
     

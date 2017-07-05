@@ -2,7 +2,6 @@
 
 namespace DF\Helpers\datastore;
 
-use DF\Helpers\datastore\exception\FileException;
 
 /**
  * Description of File
@@ -31,6 +30,7 @@ abstract class File {
         $this->file = $file;
     }
     
+    abstract public function getSize();    
     abstract public function read();
     abstract public function write($content);
     abstract public function copy($target);    
@@ -39,7 +39,9 @@ abstract class File {
     abstract public function exists(); 
     abstract public function readable();
     abstract public function writable();
-    
+    abstract public function checksum($method = 'md5');
+
+
     /**
      * Returns the full path to the file
      * @return string Returns the full path to the file
@@ -64,6 +66,24 @@ abstract class File {
         return dirname($this->file);
     }
     
+    /**
+     * Get the file extension from a file name
+     * @param type $filename
+     * @return type
+     */
+    public function getExtension()
+    {
+                        
+        $exts = explode(".", $this->getFileName());
+        
+        // No extension
+        if (count($exts) == 1){
+            return '';
+        }
+        
+        return $exts[count($exts) - 1];
+        
+    }
     
     /**
      * Set the DataStore reference

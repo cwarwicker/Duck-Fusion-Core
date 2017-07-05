@@ -1,6 +1,9 @@
 <?php
 
 namespace DF\Helpers\datastore\files;
+
+use DF\Helpers\datastore\exception\FileException as FileException;
+
 /**
  * Description of LocalFile
  *
@@ -43,6 +46,9 @@ class FTPFile extends \DF\Helpers\datastore\File {
                 
         // Firstly make sure the target path is ok
         $targetpath = $this->store->ok($target);
+        if (!$targetpath){
+            return false;
+        }
                 
         // Then check if the target file already exists
         $find = $this->store->find($target);

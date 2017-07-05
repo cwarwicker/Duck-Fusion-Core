@@ -30,9 +30,13 @@ Caching
 -----
 
 Put in a controller to cache an action, with a lifetime and type, e.g.
-Default type of dynamic will be used if not specified. If life is specified as 0, will use Quack default of 3600
+Default type of dynamic will be used if not specified. If life is specified as 0, will use Renderer default
 
 protected $cache = array('main' => array(
                         'life' => 10,
-                        'type' => \DF\Quack::CACHE_STATIC
+                        'type' => \DF\Renderer::CACHE_STATIC
                     ));
+
+If a cache is found, it will render that and exit, so it won't even go into the controller action and do anything
+DYNAMIC caching is what should be used in 99% of cases, as it will render the php script, so the php in the view is still executed, e.g. display *your* name from session
+STATIC caching will cache a static version of the compiled page and display the exact same page to whoever visits that page, so should only be used in rare cases 

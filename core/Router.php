@@ -73,12 +73,13 @@ class Router extends \Szenis\Router {
                         $className = $route->getNamespace() . $controllerName;
                         $file = df_APP_ROOT . df_DS . 'controllers' . df_DS . $controllerName . '.php';                                                
                     }
-                                        
+
                     // Try to include the file
-                    if (!include_once($file)){
-                        throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $file);
-                        df_stop();
+                    if (!file_exists($file)){
+                        Exceptions\FileExistException::fileDoesNotExist($file);
                     }
+                    
+                    include_once $file;
                     
                     // Now try and instantiate the controller
                     $return['controller'] = $className;
@@ -104,11 +105,12 @@ class Router extends \Szenis\Router {
         if ($uri == '' || $uri == 'index.php'){
                         
             // Try to include the file
-            if (!include_once($this->defaults['Path'])){
-                throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $file);
-                df_stop();
+            if (!file_exists($this->defaults['Path'])){
+                Exceptions\FileExistException::fileDoesNotExist($this->defaults['Path']);
             }
-            
+
+            include_once $this->defaults['Path'];
+                                
             $return['controller'] = $this->getNamespace() . $this->getDefault('Controller');
             $return['action'] = $this->defaults['Action'];
             
@@ -179,18 +181,21 @@ class Router extends \Szenis\Router {
             // Try and include the file now, or if we can't find it, then the default file
             if (file_exists($Control['Path'])){
                 
-                if (!include_once($Control['Path'])){
-                    throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $file);
-                    df_stop();
+                // Try to include the file
+                if (!file_exists($Control['Path'])){
+                    Exceptions\FileExistException::fileDoesNotExist($Control['Path']);
                 }
-                
+
+                include_once $Control['Path'];                
                 
             } else {
                 
-                if (!include_once($Router->getDefault('Path'))){
-                    throw new \DF\DFException(df_string('routing'), df_string('errors:couldnotloadfile'), $file);
-                    df_stop();
+                // Try to include the file
+                if (!file_exists( $Router->getDefault('Path') )){
+                    Exceptions\FileExistException::fileDoesNotExist( $Router->getDefault('Path') );
                 }
+
+                include_once $Router->getDefault('Path');
                 
                 $Control['Class'] = $this->getNamespace() . $Router->getDefault('Class');
                 
@@ -229,11 +234,13 @@ class Router extends \Szenis\Router {
         $arguments = array();
 
         foreach ($matches as $key => $match) {
+            
             if ($key === 0) continue;
 
             if (strlen($match) > 0) {
-                    $arguments[] = $match;
+                $arguments[] = $match;
             }
+            
         }
 
         return $arguments;

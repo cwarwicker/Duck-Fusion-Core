@@ -3,6 +3,7 @@
 namespace DF\Helpers\datastore\stores;
 
 use DF\Helpers\datastore\files\LocalFile;
+use DF\Helpers\datastore\exception\DataStoreException;
 
 /**
  * Description of Directory
@@ -10,9 +11,7 @@ use DF\Helpers\datastore\files\LocalFile;
  * @author Conn
  */
 class LocalStore extends \DF\Helpers\datastore\DataStore {
-        
-    
-    
+            
     /**
      * Construct the LocalStore DataStore object
      * @param type $params

@@ -71,7 +71,6 @@ $lang['errors:couldnotloadfile'] = 'Could not load file.';
 $lang['errors:couldnotloadclass'] = 'Could not load class.';
 $lang['errors:defaultcontrollerundefined'] = 'Default Controller is undefined.';
 $lang['errors:dirnotwritable'] = 'Cannot write to directory: %dir%';
-$lang['errors:invalidhashmethod'] = 'Invalid Hashing Algorithm';
 $lang['errors:invalidlogin'] = 'Incorrect Login Details';
 $lang['errors:invaliduserconfig'] = 'Invalid user configuration details detetced. Please ensure these are set in the config table';
 $lang['errors:filenotfound'] = 'File not found';

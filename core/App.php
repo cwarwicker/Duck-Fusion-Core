@@ -37,11 +37,18 @@ class App {
                 
         $namespace = dirname($name);
         $class = basename($name);
-                       
-        // is it a helper?
+                               
+        // Is it a helper?
         if (strpos($namespace, 'DF\Helpers') === 0){
             $path = str_replace('DF\Helpers', '', $namespace);
             $file = df_SYS . 'lib' . df_DS . 'helpers' . $path . df_DS . $class . '.php';
+            require_once $file;
+        }
+        
+        // Is it an exception?
+        elseif (strpos($namespace, 'DF\Exceptions') === 0){
+            $path = str_replace('DF\Exceptions', '', $namespace);
+            $file = df_SYS . 'core' . df_DS . 'Exceptions' . df_DS . $class . '.php';
             require_once $file;
         }
         
@@ -49,6 +56,7 @@ class App {
     
     /**
      * Create a new directory within this application's 'data' directory
+     * todo - change this to use localstore class
      * @param type $dir
      * @return boolean
      */

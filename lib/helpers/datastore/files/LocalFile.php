@@ -1,6 +1,9 @@
 <?php
 
 namespace DF\Helpers\datastore\files;
+
+use DF\Helpers\datastore\exception\FileException as FileException;
+
 /**
  * Description of LocalFile
  *
@@ -67,6 +70,51 @@ class LocalFile extends \DF\Helpers\datastore\File {
         return $time;
     }
     
+    /**
+     * Get the mime type of a file
+     * @param type $file
+     */
+    public function getMimeType()
+    {
+        
+        // If finfo is installed use that
+        if (function_exists('finfo_open'))
+        {
+            $info = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($info, $this->file);
+            finfo_close($info);
+            return $mime;
+        }
+        
+        throw new FileException('PHP module "fileinfo" must be installed to get mimetypes');
+        return null;
+        
+    }
+    
+    /**
+     * Get the size of the file
+     * @return type
+     */
+    public function getSize(){
+        return filesize($this->file);
+    }
+    
+    /**
+     * Get the hash of the file
+     * @param type $method
+     * @return type
+     * @throws \DF\DFException
+     */
+    public function checksum($method = 'md5'){
+    
+        $methods = hash_algos();
+        if (!in_array($method, $methods)){
+            throw new \UnexpectedValueException( sprintf("Unsupported hashing algorithm supplied (%s).", $method) );
+        }
+        
+        return hash_file($method, $this->file);
+        
+    }
     
     /**
      * Check to see if the file exists
@@ -156,5 +204,7 @@ class LocalFile extends \DF\Helpers\datastore\File {
     public function write($data, $flags = null) {
         return file_put_contents($this->file, $data, $flags);
     }
+
+   
 
 }

@@ -80,18 +80,12 @@ abstract class Controller {
 
         $Template['Path'] = $Template['Path'] . ucfirst($Template['Name']).'Template.php';
                         
-        try {
-            if(file_exists($Template['Path'])){
-                require_once($Template['Path']);
-            } else {
-                throw new \DF\DFException(df_string("template"), df_string("errors:couldnotloadfile"), $Template['Path']);
-            }
-        } catch(\DF\DFException $e){
-            ob_end_clean();
-            echo $e->getException();
-            df_stop();
+        if(file_exists($Template['Path'])){
+            require_once($Template['Path']);
+        } else {
+            \DF\Exceptions\FileExistException::fileDoesNotExist( $Template['Path'] );
         }
-                        
+        
         // Load the template class
         $this->template = new $Template['Class']($this->module);
         $this->template->setController($this->controller);
@@ -152,6 +146,17 @@ abstract class Controller {
             \DF\Router::go($cfg->www . '/404');
         }
         
+        // If this action was cached, try and find it first, so we don't run through all the time-consuming Controller scripts, only to display a cached template
+        if ($this->action && array_key_exists($this->action, $this->cache) && array_key_exists('type', $this->cache[$this->action])){
+            
+            $cache = $this->template->getEngine()->findCache($this->template->getRequestString(), $this->cache[$this->action]['type']);
+            if ($cache){
+                $this->template->getEngine()->displayCache($cache, $this->cache[$this->action]['type']);
+                exit;
+            }
+            
+        }
+        
         // if there is an action, let's try and do that before we load any template
         if ($this->action){
             $this->loadAction($this->action, $this->params);
@@ -192,31 +197,6 @@ abstract class Controller {
         
     }
     
-    /**
-     * Load a helper file
-     * TODO - should change to include try/catch probably
-     * @param mixed $helper 
-     */
-//    Don't think i need this, as it's got the helper autoloader in the App class now
-//    protected function loadHelper($helper){
-//        
-//        if (is_array($helper)){
-//            foreach($helper as $help){
-//                $this->loadHelper($help);
-//            }
-//        } else {
-//            $class = "\\DF\\Helpers\\{$helper}";
-//            $reflection = new \ReflectionClass( $class );
-//            if (!$reflection->isAbstract()){
-//                $this->$helper = new $class();
-//                return $this->$helper;
-//            } else {
-//                // debug log - abstract so cannot load into controller
-//            }
-//        }
-//        
-//    }
-
     /**
      * Get the template object
      * @return type

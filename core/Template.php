@@ -11,6 +11,8 @@
 
 namespace DF;
 
+use DF\Renderer;
+
 class Template {
 
     protected $module = false;
@@ -24,17 +26,47 @@ class Template {
     public $cache = array();
     public $cache_output = false;
 
+    protected $engine = 'DF\Quack';
     protected $setFile = false;
+    protected $reserved = array();
     
     private $rendered = false;
     
     
     
     public function __construct($module = false) {
+        
         global $cfg, $User;
+        
+        // Set the parsing engine to use to render the templates
+        $this->setEngine(new $this->engine());
+
+        // Set the module if we are in one
         $this->module = $module;
+        
+        // Set the global variables to be accessible in every template and then set their names to be reserved so they cannot be overwritten
         $this->set("cfg", $cfg);
         $this->set("User", $User);
+        $this->reserved = array('cfg', 'User');
+        
+    }
+    
+    /**
+     * Set the parsing engine
+     * @param \DF\Parser $engine
+     * @return $this
+     */
+    public function setEngine(Renderer $engine){
+        $this->engine = $engine;
+        return $this;
+    }
+    
+    /**
+     * Get the render engine being used by this template
+     * @return type
+     */
+    public function getEngine(){
+        return $this->engine;
     }
     
     /**
@@ -42,9 +74,32 @@ class Template {
      * @param type $name
      * @param type $value 
      */
-    public function set($name,$value){
+    public function set($name, $value){
+        
+        if (in_array($name, $this->reserved)){
+            // todo - debugging warning
+            return $this;
+        }
+        
         $this->vars[$name] = $value;
         return $this;
+    }
+    
+    /**
+     * Take an array of values and set them all as individual variables
+     * @param type $array
+     * @return $this
+     */
+    public function multiSet($array){
+        
+        if ($array){
+            foreach($array as $key => $val){
+                $this->set($key, $val);
+            }
+        }
+        
+        return $this;
+        
     }
     
     /**
@@ -54,6 +109,33 @@ class Template {
      */
     public function get($var){
         return (isset($this->vars[$var])) ? $this->vars[$var] : null;
+    }
+    
+    /**
+     * Unset a variable which has previously been set
+     * @param type $name
+     * @return $this
+     */
+    public function clear($name){
+        unset($this->vars[$name]);
+        return $this;
+    }
+    
+    /**
+     * Checks if a specific variable has been set
+     * @param type $name
+     * @return type
+     */
+    public function has($name){
+        return (array_key_exists($name, $this->vars));
+    }
+    
+    /**
+     * Gets all the variables which have been set
+     * @return type
+     */
+    public function all(){
+        return $this->vars;
     }
     
     public function setController($controller){
@@ -222,17 +304,16 @@ class Template {
             $view = $this->getAutomatedView();
         }
                                                        
-        $Quack = new \DF\Quack();
-        $Quack->setVars( $this->vars );
-        $Quack->setRequestString($this->getRequestString());
+        $this->engine->setVars( $this->vars );
+        $this->engine->setRequestString( $this->getRequestString() );
                 
         // Cache this action if we are using Cache
         if ($this->cache_output){
-            $Quack->setCaching( (isset($this->cache['type'])) ? $this->cache['type'] : Quack::CACHE_DYNAMIC );
-            $Quack->setCachingLife($this->cache['life']);
+            $this->engine->setCaching( (isset($this->cache['type'])) ? $this->cache['type'] : Renderer::CACHE_DYNAMIC );
+            $this->engine->setCachingLife($this->cache['life']);
         }
 
-        $Quack->render($view);
+        $this->engine->render($view);
         
         return true;        
                 
