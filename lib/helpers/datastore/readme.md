@@ -72,3 +72,18 @@ e.g.
     // This will move the temporary file to the DataStore's working directory and rename it with the actual filename of the uploaded file
     $file->move('', $_FILES['myfile']['name']);
 ```
+
+
+# Other Data Stores
+
+## FTP
+
+e.g.
+
+```php
+    $ftp = new \DF\Helpers\datastore\stores\FTPStore( array('host' => 'test.rebex.net', 'user' => 'demo', 'pass' => 'password') );
+    $file = $ftp->find('readme.txt');
+    if ($file){
+        var_dump($file->read());
+    }
+```

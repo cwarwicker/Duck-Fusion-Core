@@ -87,7 +87,7 @@ class FTPStore extends \DF\Helpers\datastore\DataStore {
     }
 
     /**
-     * 
+     * Find a file in the Store
      * @param type $path
      */
     public function find($path) {
@@ -185,10 +185,28 @@ class FTPStore extends \DF\Helpers\datastore\DataStore {
 
     /**
      * Get an array of all the files and directories in the working directory
+     * Unlike the LocalStore, this cannot recursively get the files and sub directories. Not easily anyway. Maybe in the future
      * @return type
      */
-    public function listAll() {
-        return ftp_nlist($this->conn, $this->dir);
+    public function listAll($objects = false) {
+        
+        $files = array();
+        $list = ftp_nlist($this->conn, $this->dir);
+        
+        if ($list)
+        {
+            foreach($list as $filename)
+            {
+                $file = ($objects) ? $this->find($filename) : $filename;
+                if ($file)
+                {
+                    $files[] = $file;
+                }
+            }
+        }
+        
+        return $files;
+        
     }
     
     

@@ -25,7 +25,7 @@ abstract class Controller {
     protected $cache = array();
     
     // Look at this authentication thing - don't know if it really does anything yet
-    protected $requireAuthentication = false;
+    protected $requireAuth = false;
     protected $requireAuthenticationRedirect = '';
 
     public function __construct($module) {
@@ -33,7 +33,7 @@ abstract class Controller {
         global $cfg, $User;
                 
         // Do we need to be logged in to use this Controller?
-        if ($this->requireAuthentication){
+        if ($this->requireAuth){
             
             // If the $User variable is not set (which should be set in the application's Session.php file), redirect
             if (!$User){

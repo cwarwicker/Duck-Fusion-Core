@@ -1,5 +1,6 @@
 TODO:
 
+- FTPStore and FTPFile - Finish classes
 - Update all method comments
 - Arr class
     - insert($array, 'New Element', $position)
@@ -10,8 +11,6 @@ TODO:
     - Cron.php should just have an array of crons to run, with the path and repetition
     - Store last ran info for each cron in the config_table
 - CLI - Redo the CLI or use an existing php library, as its not very good
-- FTPDirectory - Need to change the listAll() to adhere to lock() and only show ones in that directory
-
 - Error logging - Exception handling, logging to files, etc...
 
 
@@ -28,6 +27,7 @@ IDEAS:
 REMINDERS:
 
 Caching
+-----
 
 Put in a controller to cache an action, with a lifetime and type, e.g.
 Default type of dynamic will be used if not specified. If life is specified as 0, will use Quack default of 3600
