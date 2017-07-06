@@ -211,7 +211,7 @@ class Auth
         
         $methods = hash_algos();
         if (!in_array($this->method, $methods)){
-            throw new \DF\DFException(df_string("authentication"), df_string("errors:invalidhashmethod"));
+            \DF\Exceptions\AuthenticationException::invalidHashAlgorithm($this->method);
             return false;
         }
         

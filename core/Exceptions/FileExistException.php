@@ -2,7 +2,7 @@
 
 namespace DF\Exceptions;
 
-class FileExistException extends \Exception {
+class FileException extends \Exception {
     
     public static function fileDoesNotExist($file){
         throw new self( sprintf('Cannot load file - %s', $file) );

@@ -27,11 +27,16 @@ class Textarea extends FormElement {
         
         $output = "";
         
-        $output .= "<div class='form-group'>";
+        $hasError = ($this->errors) ? 'has-error' : '';
+        
+        $output .= "<div class='form-group {$hasError}'>";
             if (isset($this->extras['label'])){
                 $output .= "<label for='{$this->getElementID()}'>{$this->extras['label']}</label>";
             }
         $output .= $content;
+        if ($hasError){
+            $output .= "<small class='help-block'>{$this->validation_err_message}</small>";
+        }
         $output .= "</div>";
 
         return $output;

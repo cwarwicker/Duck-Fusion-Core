@@ -27,7 +27,7 @@ class Session {
     public static function write($key, $value){
         
         if (!is_string($key)){
-            throw new \InvalidArgumentException( \df_string('errors:sessionkey') );
+            \DF\Exceptions\SessionException::invalidSessionKey();
         }
         
         $_SESSION[$key] = $value;

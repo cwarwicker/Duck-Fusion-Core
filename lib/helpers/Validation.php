@@ -1,8 +1,17 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+namespace DF\Helpers;
 
+class Validation extends \GUMP {
+    
+    protected $rules = array();
+    
+    public function addRule($el, $validation){
+        $this->rules[$el] = $validation;
+    }
+    
+    public function validates($data) {
+        return $this->validate($data, $this->rules);
+    }
+    
+}

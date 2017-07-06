@@ -32,9 +32,14 @@ function df_stop(){
  * @param string $language Shortcode for language, default is 'en'
  * @return string 
  */
-function df_string($string, $app = false, $language='en'){
+function df_string($string, $app = false, $language = null){
     
-    // If language is set use that, otherwise use english
+    global $cfg;
+    
+    // If language is set use that, otherwise use the default in the configuration file, otherwise just use english
+    if (is_null($language)){
+        $language = (isset($cfg->locale)) ? $cfg->locale : 'en';
+    }
     
     // if using our application's language file, get that, otherwise get the systemone
     if ($app){
@@ -46,7 +51,7 @@ function df_string($string, $app = false, $language='en'){
     // if the lang file exists, include it
     if (file_exists($file)){
         
-        include $file;
+        include_once $file;
         
         // If that element is set in the lang array, return it
         if (isset($lang[$string])){
@@ -78,7 +83,7 @@ function df_call_routing(){
     // Load any application-defined routes
     $routerFile = df_APP_ROOT . df_DS . 'config' . df_DS . 'Routes.php';
     if (!file_exists($routerFile)){
-        throw new \DF\Exceptions\FileExistException('Missing Routes.php file in /config directory.');
+        \DF\Exceptions\FileException::fileDoesNotExist($routerFile);
     }
     
     include_once $routerFile;
@@ -125,10 +130,17 @@ function df_call_routing(){
 function df_setup(){
     
     global $cfg, $db;
+        
+    // Register Error Handler first, so that can be used if there are any errors in the setup
+    if ($cfg->env == 'dev' && class_exists('\Whoops\Run')){
+        $whoops = new \Whoops\Run();
+        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
+        $whoops->register();
+    }
     
     // Make sure that a URL has been specified in the config
     if (strlen($cfg->www) == 0){
-        \df_error('errors:config:www');
+        \DF\Exceptions\ConfigException::www();
     }
     
     // Start the DF session
@@ -168,18 +180,17 @@ function df_setup(){
         header('Content-Type: text/html; charset='.$cfg->charset);
     }
     
+    // Set timezone
+    if (isset($cfg->timezone)){
+        date_default_timezone_set($cfg->timezone);
+    }
     
     // If they are using composer and have a vendor/autoload.php file, automatically include that
     if (file_exists(df_APP_ROOT . df_DS . 'vendor/autoload.php')){
         require_once df_APP_ROOT . df_DS . 'vendor/autoload.php';
     }
     
-    // Register Error Handler
-    if ($cfg->env == 'dev' && class_exists('\Whoops\Run')){
-        $whoops = new \Whoops\Run();
-        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
-        $whoops->register();
-    }
+    
     
             
     // If database info is set, let's create a global db object
@@ -478,27 +489,6 @@ function df_get_file_extension($filename){
 }
 
 
-/**
- * Unrecoverable error, or just an error we want to stop execution at
- * @param mixed $e string or DFException object
- */
-function df_error($error){
-        
-    global $cfg;
-    
-    // Get current output content
-    $content = ob_get_contents();
-    
-    // Clear all output
-    ob_end_clean();
-    
-    
-    // Stop
-    \df_stop();
-    
-    
-    
-}
 
 /**
  * Convert single dimensional array of attributes to a string, to be used as html tag attributes

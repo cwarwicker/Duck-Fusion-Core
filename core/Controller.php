@@ -83,7 +83,7 @@ abstract class Controller {
         if(file_exists($Template['Path'])){
             require_once($Template['Path']);
         } else {
-            \DF\Exceptions\FileExistException::fileDoesNotExist( $Template['Path'] );
+            \DF\Exceptions\FileException::fileDoesNotExist( $Template['Path'] );
         }
         
         // Load the template class

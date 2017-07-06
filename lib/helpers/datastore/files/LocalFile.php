@@ -86,8 +86,7 @@ class LocalFile extends \DF\Helpers\datastore\File {
             return $mime;
         }
         
-        throw new FileException('PHP module "fileinfo" must be installed to get mimetypes');
-        return null;
+        \DF\Exceptions\EnvException::missingModule('fileinfo');
         
     }
     
@@ -109,7 +108,7 @@ class LocalFile extends \DF\Helpers\datastore\File {
     
         $methods = hash_algos();
         if (!in_array($method, $methods)){
-            throw new \UnexpectedValueException( sprintf("Unsupported hashing algorithm supplied (%s).", $method) );
+            \DF\Exceptions\AuthenticationException::invalidHashAlgorithm($method);
         }
         
         return hash_file($method, $this->file);

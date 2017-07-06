@@ -12,6 +12,7 @@
 namespace DF\Helpers\html\forms;
 
 use DF\Helpers\Arr;
+use DF\Helpers\Validation;
 
 class Form {
 
@@ -20,9 +21,12 @@ class Form {
     private $attributes = array();
     private $fields = array();
     private $options = array();
+    private $validator;
+    private $data = array();
     
     public function __construct($id) {
         $this->id = $id . '_form';
+        $this->validator = new Validation();
     }
     
     public function setOptions($options){
@@ -167,7 +171,26 @@ class Form {
             $field->setValue($value);
             $field->setAttributes($attributes);
             $field->setExtras( array_merge($this->options, $extras) );
-            $this->fields[] = $field;
+            $this->fields[$name] = $field;
+        }
+        
+        return $this;
+        
+    }
+    
+    /**
+     * Add validation rules to an element in the form
+     * For a list of validation rules, see: https://packagist.org/packages/wixel/gump
+     * @param type $name
+     * @param type $validation
+     * @return $this
+     */
+    public function addValidation($name, $validation, $errorMsg){
+        
+        $field = $this->getField($name);
+        if ($field){
+            $field->validation = $validation;
+            $field->validation_err_message = $errorMsg;
         }
         
         return $this;
@@ -185,22 +208,61 @@ class Form {
         switch($method)
         {
             case 'post':
-                $data = $_POST;
+                $this->data = $_POST;
             break;
             case 'get':
-                $data = $_GET;
+                $this->data = $_GET;
             break;
             default:
-                $data = $_REQUEST;
+                $this->data = $_REQUEST;
             break;
         }
         
         // Is this form submitted?
-        if (isset($data['submit_form_'.$this->id])){
-            return $data;
+        if (isset($this->data['submit_form_'.$this->id])){
+            return $this->data;
         }
         
         return false;
+        
+    }
+    
+    public function validate(){
+        
+        if (!$this->data){
+            $this->data();
+        }
+        
+        $result = true;
+                
+        if ($this->fields){
+            foreach($this->fields as $field){
+                if ($field->hasValidation()){
+                    $validate = $field->validate( $this->validator, @$this->data[$field->name]);
+                    $result = $result && ($validate === true);
+                }
+            }
+        }
+        
+        return $result;
+        
+    }
+    
+   
+    
+    public function getValidationErrors(){
+        
+        $return = array();
+        
+        if ($this->fields){
+            foreach($this->fields as $field){
+                if ($field->errors){
+                    $return[$field->name] = $field->errors;
+                }
+            }
+        }
+        
+        return $return;
         
     }
     
@@ -225,6 +287,10 @@ class Form {
         return (isset($_FILES[$name])) ? $_FILES[$name] : false;
     }
     
+    public function getField($name){
+        return (array_key_exists($name, $this->fields)) ? $this->fields[$name] : false;        
+    }
+    
     /**
      * Get the method of the form
      * @return type
@@ -237,10 +303,10 @@ class Form {
     }
     
     /**
-     * Check if everything is ok with the form - request method matches expected, and token matches
+     * Check if the form is secure - Request method is as expected and token matches
      * @return type
      */
-    public function ok(){
+    public function secure(){
         return ($this->isSafe() && $this->isTokenValid());
     }
     

@@ -25,7 +25,7 @@ class Security {
         
         // Check session is started
         if (session_status() !== PHP_SESSION_ACTIVE){
-            throw new \DF\DFException( df_string('security'), df_string('errors:sessionnotstarted') );
+            \DF\Exceptions\SessionException::sessionNotStarted();
         }
         
         if (!isset($_SESSION[$key]) && $create){

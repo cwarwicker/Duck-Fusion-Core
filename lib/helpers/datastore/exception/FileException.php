@@ -2,4 +2,8 @@
 
 namespace DF\Helpers\datastore\exception;
 
-class FileException extends \Exception {}
+class FileException extends \Exception {
+    
+    
+    
+}

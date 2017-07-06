@@ -9,10 +9,11 @@
  */
 
 if ( (!defined('df_APP') || !defined('df_APP_ROOT')) && !defined('df_CLI')){
-    trigger_error('Application path not defined. Unable to continue', E_USER_ERROR);
+    die('Application path not defined. Unable to continue');
     exit;
 }
 
+// Set error reporting here, so we can see any errors which occur before we actually load the environment config
 error_reporting(E_ALL);
 
 // Define constants

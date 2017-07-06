@@ -38,6 +38,8 @@ class Input extends FormElement {
         
         $output = "";
         
+        $hasError = ($this->errors) ? 'has-error' : '';
+                
         // Submit/Button
         if ($this->type == 'submit' || $this->type == 'button'){
             $output = $content;
@@ -45,23 +47,29 @@ class Input extends FormElement {
         
         // Checkbox/Radio
         elseif ($this->type == 'checkbox' || $this->type == 'radio'){
-            $output .= "<div class='{$this->type}'>";
+            $output .= "<div class='{$this->type} {$hasError}'>";
             $output .= "<label>";
                 $output .= $content;
                 if (isset($this->extras['label'])){
                     $output .= $this->extras['label'];
                 }
             $output .= "</label>";
+            if ($hasError){
+                $output .= "<small class='help-block'>{$this->validation_err_message}</small>";
+            }
             $output .= "</div>";
         }
         
         // Everything else
         else {
-            $output .= "<div class='form-group'>";
+            $output .= "<div class='form-group {$hasError}'>";
                 if (isset($this->extras['label'])){
                     $output .= "<label for='{$this->getElementID()}'>{$this->extras['label']}</label>";
                 }
             $output .= $content;
+            if ($hasError){
+                $output .= "<small class='help-block'>{$this->validation_err_message}</small>";
+            }
             $output .= "</div>";
         }
         

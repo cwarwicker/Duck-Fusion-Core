@@ -76,7 +76,7 @@ class Router extends \Szenis\Router {
 
                     // Try to include the file
                     if (!file_exists($file)){
-                        Exceptions\FileExistException::fileDoesNotExist($file);
+                        Exceptions\FileException::fileDoesNotExist($file);
                     }
                     
                     include_once $file;
@@ -106,7 +106,7 @@ class Router extends \Szenis\Router {
                         
             // Try to include the file
             if (!file_exists($this->defaults['Path'])){
-                Exceptions\FileExistException::fileDoesNotExist($this->defaults['Path']);
+                Exceptions\FileException::fileDoesNotExist($this->defaults['Path']);
             }
 
             include_once $this->defaults['Path'];
@@ -183,7 +183,7 @@ class Router extends \Szenis\Router {
                 
                 // Try to include the file
                 if (!file_exists($Control['Path'])){
-                    Exceptions\FileExistException::fileDoesNotExist($Control['Path']);
+                    Exceptions\FileException::fileDoesNotExist($Control['Path']);
                 }
 
                 include_once $Control['Path'];                
@@ -192,7 +192,7 @@ class Router extends \Szenis\Router {
                 
                 // Try to include the file
                 if (!file_exists( $Router->getDefault('Path') )){
-                    Exceptions\FileExistException::fileDoesNotExist( $Router->getDefault('Path') );
+                    Exceptions\FileException::fileDoesNotExist( $Router->getDefault('Path') );
                 }
 
                 include_once $Router->getDefault('Path');

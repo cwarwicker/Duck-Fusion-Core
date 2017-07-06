@@ -15,6 +15,9 @@ abstract class FormElement {
     public $value;
     public $attributes;
     public $extras;
+    public $validation;
+    public $validation_err_message;
+    public $errors;
     
     public function __construct($id = null){
         
@@ -54,6 +57,10 @@ abstract class FormElement {
         return $this->attributes;
     }
     
+    public function hasValidation(){
+        return (strlen($this->validation) > 0);
+    }
+    
     public function addAttribute($key, $val){
         $this->attributes[$key] = $val;
     }
@@ -81,6 +88,21 @@ abstract class FormElement {
     
     public function getExtras(){
         return $this->extras;
+    }
+    
+    public function validate(\DF\Helpers\Validation $validator, $data){
+        
+        echo "Field: $this->name<br>";
+        
+        $result = $validator->validate( array($this->name => $data), array($this->name => $this->validation) );       
+        
+        // If it's an array, it's the array of errors
+        if (is_array($result)){
+            $this->errors = $result;
+        }
+        
+        return $result;
+        
     }
     
 }

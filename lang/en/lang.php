@@ -65,22 +65,13 @@ $lang['email'] = 'Email';
 $lang['emailaddress'] = 'Email Address';
 $lang['error'] = 'Error';
 
-
-$lang['errors:config:www'] = 'Application URL not found. If you have just created this application, please edit your Config.php file with the relevant settings for your application.';
-$lang['errors:couldnotloadfile'] = 'Could not load file.';
-$lang['errors:couldnotloadclass'] = 'Could not load class.';
-$lang['errors:defaultcontrollerundefined'] = 'Default Controller is undefined.';
 $lang['errors:dirnotwritable'] = 'Cannot write to directory: %dir%';
 $lang['errors:invalidlogin'] = 'Incorrect Login Details';
-$lang['errors:invaliduserconfig'] = 'Invalid user configuration details detetced. Please ensure these are set in the config table';
+$lang['errors:invaliduserconfig'] = 'Invalid user configuration details detected. Please ensure these are set in the config table';
 $lang['errors:filenotfound'] = 'File not found';
-$lang['errors:sessionkey'] = 'Session key must have a string value';
-$lang['errors:sessionnotstarted'] = 'Session has not been started';
 $lang['errors:syserror'] = 'System error';
 $lang['errors:uploadfail'] = 'File could not be uploaded due to unknown error';
 $lang['errors:userunconfirmed'] = 'This account has not yet been confirmed';
-
-$lang['errorpage:title'] = 'Whoops! An error has occurred.';
 
 $lang['exception'] = 'Exception';
 $lang['expected'] = 'Expected';

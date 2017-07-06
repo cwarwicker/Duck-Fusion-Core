@@ -357,6 +357,7 @@ class GUMP
      */
     public function validate(array $input, array $ruleset)
     {
+        
         $this->errors = array();
 
         foreach ($ruleset as $field => $rules) {

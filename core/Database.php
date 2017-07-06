@@ -134,4 +134,4 @@ class Recordset {
     
 }
 
-include_once df_SYS_CORE . 'db' . df_DS . 'PDO.php';
+include_once df_SYS_CORE . 'DB' . df_DS . 'PDO.php';

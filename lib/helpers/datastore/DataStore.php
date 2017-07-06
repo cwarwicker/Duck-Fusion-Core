@@ -51,14 +51,10 @@ abstract class DataStore {
      */
     public function __construct($params) {
         
-        try {
-            if (!$this->connect($params)){
-                throw new DataStoreException('connectionfailed');
-            }
-        } catch (DataStoreException $e){
-            \df_error($e);
+        if (!$this->connect($params)){
+            DataStoreException::connectionFailed();
         }
-        
+               
     }
     
     public function __destruct() {
