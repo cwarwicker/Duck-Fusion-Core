@@ -20,12 +20,8 @@
 
 /**
  *
- * Validation
+ * FileException
  * 
- * This Helper class extends the GUMP library class and can be used alongside the Form Helper class to add validation rules to form elements
- * 
- * For more information on how to use the GUMP library, see: https://github.com/Wixel/GUMP
- *
  * @copyright    Copyright (c) 2017 Conn Warwicker
  * @package      DuckFusion
  * @version      0.1
@@ -34,18 +30,12 @@
  *
  **/
 
-namespace DF\Helpers;
+namespace DF\Exceptions;
 
-class Validation extends \GUMP {
+class FileException extends \Exception {
     
-    protected $rules = array();
-    
-    public function addRule($el, $validation){
-        $this->rules[$el] = $validation;
-    }
-    
-    public function validates($data) {
-        return $this->validate($data, $this->rules);
+    public static function fileDoesNotExist($file){
+        throw new self( sprintf('Cannot load file - %s', $file) );
     }
     
 }

@@ -1,26 +1,45 @@
 <?php
-namespace DF;
+/*
+
+    This file is part of the DuckFusion Framework.
+
+    This is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DuckFusion Framework is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DuckFusion Framework.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
 
 /**
- * Quack is the templating engine which powers Duck Fusion projects
- * 
- * Notes: 
- * 
- * Each action's template should have a [[use:x]] at the top, telling it which actual full template file to use, with the header, footer, etc... then the content of the action tpl
- * should be inside a [[section]] which can be [[import]]ed in the template file.
- * 
- * 13/03/2015 - Issues with delim regexs. If we have the /U flag, then we can have multiple on same line, e.g. {echo 'sup again'} {echo 'sup now'}, but then it fucks up with double and triple delims
- *            - If we don't have the /U flag, then the other delims work, but we get a parse error if we have multiple on same line, as it's wrapping to first and last
- *            - Will leave with /U flag for now, but needs fixing
- * 
- * 30/06/2017 - Future possibility - Look at redoing this, so it doesn't all parse one big string, breaks it down and goes through one "token" at a time, like in the twig template engine
  *
- * @author Conn Warwicker
- */
+ * Quack
+ * 
+ * This class contains the rendering engine "Quack" which is used by default to render template files
+ *
+ * @copyright    Copyright (c) 2017 Conn Warwicker
+ * @package      DuckFusion
+ * @version      0.1
+ * @author       Conn Warwicker <conn@cmrwarwicker.com>
+ * @link         https://github.com/cwarwicker/Duck-Fusion-Core
+ *
+ **/
 
 // Issues
+// - Issues with delim regexs. If we have the /U flag, then we can have multiple on same line, e.g. {echo 'sup again'} {echo 'sup now'}, but then it fucks up with double and triple delims
+// - If we don't have the /U flag, then the other delims work, but we get a parse error if we have multiple on same line, as it's wrapping to first and last
+// - Will leave with /U flag for now, but needs fixing
 // - [[noparse]] doesn't work properly, if you are inside a tag and you are parsing the end of that tag, e.g. [[section:a]][[noparse]][[section:b]]hi[[endsection]][[endnoparse]][[endsection]]
-// switch case doesn't work unless first case is at the beginning of line. Any spaces or tabs cause an error. Need to strip any whitespace between them.
+// - switch case doesn't work unless first case is at the beginning of line. Any spaces or tabs cause an error. Need to strip any whitespace between them.
+
+namespace DF;
 
 use DF\Renderer;
 

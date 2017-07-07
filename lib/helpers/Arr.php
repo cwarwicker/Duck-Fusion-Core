@@ -1,18 +1,39 @@
 <?php
+/*
+
+    This file is part of the DuckFusion Framework.
+
+    This is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DuckFusion Framework is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DuckFusion Framework.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
 
 /**
- * Helper functions: Arrays
+ *
+ * Arr
  * 
- * @copyright 16-Jun-2013
- * @package DuckFusion
- * @version 1
- * @author Conn Warwicker <conn@cmrwarwicker.com>
- */
+ * This Helper class provides various methods for working with arrays.
+ * Each method can also be accessed via a global function, defined in the common/Functions.php file
+ *
+ * @copyright    Copyright (c) 2017 Conn Warwicker
+ * @package      DuckFusion
+ * @version      0.1
+ * @author       Conn Warwicker <conn@cmrwarwicker.com>
+ * @link         https://github.com/cwarwicker/Duck-Fusion-Core
+ *
+ **/
 
 namespace DF\Helpers;
-
-
-//more
 
 abstract class Arr
 {

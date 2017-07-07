@@ -1,4 +1,3 @@
-<?php
 /*
 
     This file is part of the DuckFusion Framework.
@@ -20,11 +19,9 @@
 
 /**
  *
- * Validation
+ * Description of file
  * 
- * This Helper class extends the GUMP library class and can be used alongside the Form Helper class to add validation rules to form elements
- * 
- * For more information on how to use the GUMP library, see: https://github.com/Wixel/GUMP
+ * Longer description of file
  *
  * @copyright    Copyright (c) 2017 Conn Warwicker
  * @package      DuckFusion
@@ -33,19 +30,3 @@
  * @link         https://github.com/cwarwicker/Duck-Fusion-Core
  *
  **/
-
-namespace DF\Helpers;
-
-class Validation extends \GUMP {
-    
-    protected $rules = array();
-    
-    public function addRule($el, $validation){
-        $this->rules[$el] = $validation;
-    }
-    
-    public function validates($data) {
-        return $this->validate($data, $this->rules);
-    }
-    
-}

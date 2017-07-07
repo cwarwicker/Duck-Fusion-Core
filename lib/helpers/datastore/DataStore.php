@@ -1,16 +1,41 @@
 <?php
+/*
 
+    This file is part of the DuckFusion Framework.
+
+    This is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DuckFusion Framework is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DuckFusion Framework.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+/**
+ *
+ * DataStore
+ * 
+ * This abstract class contains all the generic methods for working with a data store, and should be extended into different classes for each type of data store
+ *
+ * @copyright    Copyright (c) 2017 Conn Warwicker
+ * @package      DuckFusion
+ * @version      0.1
+ * @author       Conn Warwicker <conn@cmrwarwicker.com>
+ * @link         https://github.com/cwarwicker/Duck-Fusion-Core
+ *
+ **/
 
 namespace DF\Helpers\datastore;
 
-use DF\Helpers\datastore\stores\LocalStore;
 use DF\Helpers\datastore\exception\DataStoreException;
 
-/**
- * Description of DataStore
- *
- * @author Conn
- */
 abstract class DataStore {
     
     /**

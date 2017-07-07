@@ -1,14 +1,39 @@
 <?php
+/*
+
+    This file is part of the DuckFusion Framework.
+
+    This is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DuckFusion Framework is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DuckFusion Framework.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+/**
+ *
+ * FTPFile
+ * 
+ * This class contains all the methods for working with remote FTP files
+ *
+ * @copyright    Copyright (c) 2017 Conn Warwicker
+ * @package      DuckFusion
+ * @version      0.1
+ * @author       Conn Warwicker <conn@cmrwarwicker.com>
+ * @link         https://github.com/cwarwicker/Duck-Fusion-Core
+ *
+ **/
 
 namespace DF\Helpers\datastore\files;
 
-use DF\Helpers\datastore\exception\FileException as FileException;
-
-/**
- * Description of LocalFile
- *
- * @author Conn
- */
 class FTPFile extends \DF\Helpers\datastore\File {
        
     /**
@@ -118,7 +143,23 @@ class FTPFile extends \DF\Helpers\datastore\File {
      * @return type
      */
     public function write($data, $flags = null) {
-        // TODO
+        
+        global $cfg;
+        
+        // Copy the file down into a tmp file
+        $ds = new \DF\Helpers\datastore\stores\LocalStore($cfg->tmp);
+        $tmpfilename = 'tmp-' . string_rand(10);
+        $tmpfile = $this->download($ds, $tmpfilename);
+                
+        // Write to that local file
+        $tmpfile->write($data, $flags);
+        
+        // Upload the new file back and overwrite the existing one on the remote server
+        $this->store->upload($tmpfile, $this->getFileName());
+        
+        // Delete the temp file
+        $tmpfile->delete();
+        
     }
 
     /**
@@ -153,6 +194,28 @@ class FTPFile extends \DF\Helpers\datastore\File {
         return $time;
     }
 
-   
+    /**
+     * Get the checksum hash of the file contents
+     * @param type $method
+     * @return type
+     */
+    public function checksum($method = 'md5') {
+        
+        $methods = hash_algos();
+        if (!in_array($method, $methods)){
+            \DF\Exceptions\AuthenticationException::invalidHashAlgorithm($method);
+        }
+        
+        return hash($method, $this->read());
+        
+    }
+
+    /**
+     * Get the size of the remote file
+     * @return type
+     */
+    public function getSize() {
+        return ftp_size($this->store->conn, $this->getFullPath());
+    }
 
 }
