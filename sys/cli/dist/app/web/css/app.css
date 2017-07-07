@@ -1,1 +1,28 @@
 /* Put your css here */
+
+header
+{
+    background: #333333;
+    color: #fff;
+    height: 60px;
+    padding: 10px;
+}
+
+div.container
+{
+    margin-top: 40px;
+}
+
+a.btn-duck
+{
+    background-color: #345844;
+    border-color: #1A3D52;
+    color: #fff;
+}
+
+a.btn-duck:hover
+{
+    background-color: #284A7E;
+    border-color: #0A2C68;
+    color: #fff;
+}
