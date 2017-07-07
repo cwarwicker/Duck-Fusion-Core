@@ -32,6 +32,8 @@
  *
  **/
 
+require_once df_SYS_CORE . 'System.php';
+
 require_once df_SYS_CORE . 'App.php';
 \DF\App::register();
 

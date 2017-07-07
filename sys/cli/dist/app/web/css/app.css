@@ -2,14 +2,20 @@
 
 header
 {
-    background: #333333;
+    background: #1e2431;
     color: #fff;
-    height: 60px;
+    height: 150px;
     padding: 10px;
 }
 
-div.container
+header > img.ducklogo
 {
+    height: 130px;
+}
+
+div.content
+{
+    width: 90%;
     margin-top: 40px;
 }
 
@@ -24,5 +30,10 @@ a.btn-duck:hover
 {
     background-color: #284A7E;
     border-color: #0A2C68;
+    color: #fff;
+}
+
+a.btn-duck:focus
+{
     color: #fff;
 }

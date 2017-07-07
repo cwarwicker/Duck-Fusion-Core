@@ -209,9 +209,6 @@ function df_setup(){
         require_once df_APP_ROOT . df_DS . 'vendor/autoload.php';
     }
     
-    
-    
-            
     // If database info is set, let's create a global db object
     if ( isset($cfg->db_driver) && !empty($cfg->db_driver) 
           && isset($cfg->db_host) && !empty($cfg->db_host)
