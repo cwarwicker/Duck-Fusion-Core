@@ -1,7 +1,5 @@
 TODO:
 
-- FTPStore and FTPFile - Finish classes
-- Update all method comments
 - Arr class
     - delete($array, 'people.alex')
 - Crons
@@ -15,7 +13,6 @@ TODO:
 
 IDEAS:
 
-- Different environments, e.g. create different directories of config file for the app, and then define the environment in apache, so it can load different config on diff systems
 - Models - ORM
 
 
