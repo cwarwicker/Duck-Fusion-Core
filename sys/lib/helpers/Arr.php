@@ -52,32 +52,24 @@ abstract class Arr
     
     
     /**
-     * Work out the average of all the elements in the array
+     * Total up the values of a given key in the array and work out an average
      * @param array $array
-     * @param \Closure $function If this is passed in, then if any elements in the array are arrays or objects, this Closure will be called to return the value you want from it.
-     *        Need to make sure it returns FALSE if there is a problem, so the total and count are not incremented
+     * @param type $key
      * @return type
      */
-    public static function avg(array $array, \Closure $function = null){
+    public static function avg(array $array, $key){
         
-        $ttl = 0;
         $cnt = 0;
-        foreach($array as $arr){
-            
-            // If the element is an array itself or an object, call the Closure to get which element we want from it
-            if (is_array($arr) || is_object($arr)){
-                $result = call_user_func($function, $arr);
-                if ($result !== false){
-                    $ttl += $result;
-                    $cnt++;
-                }
-            } elseif (is_numeric($arr)){
-                $ttl += $arr;
+        $sum = 0;
+        
+        foreach($array as $element => $values){
+            if (array_key_exists($key, $values)){
                 $cnt++;
+                $sum += $values[$key];
             }
         }
-                
-        return ($ttl / $cnt);
+        
+        return ($sum / $cnt);
         
     }
     
@@ -252,11 +244,11 @@ abstract class Arr
      * 
      * Examples:
      * 
-     *  var_dump( \DF\Helpers\Arr::add( $array, 'new', 'new one' ) );
-        var_dump( \DF\Helpers\Arr::add( $array, 'people.liz.hair', 'pink', self::ARR_EXISTS_APPEND ) );
-        var_dump( \DF\Helpers\Arr::add( $array, 'people.conn.age', 18 ) );
-        var_dump( \DF\Helpers\Arr::add( $array, 'people', 'test' ) );
-        var_dump( \DF\Helpers\Arr::add( $array, 'people.conn.age', 38 ) );
+     *   var_dump( \DF\Helpers\Arr::add( $array, 'new', 'new one' ) );
+     *   var_dump( \DF\Helpers\Arr::add( $array, 'people.liz.hair', 'pink', self::ARR_EXISTS_APPEND ) );
+     *   var_dump( \DF\Helpers\Arr::add( $array, 'people.conn.age', 18 ) );
+     *   var_dump( \DF\Helpers\Arr::add( $array, 'people', 'test' ) );
+     *   var_dump( \DF\Helpers\Arr::add( $array, 'people.conn.age', 38 ) );
      * 
      * @param type $array
      * @param type $key
@@ -318,6 +310,31 @@ abstract class Arr
             break;
         
         }
+        
+    }
+    
+    
+    public static function delete(array &$array, $key){
+        
+        // todo
+        
+    }
+    
+    /**
+     * Total up the values of a given key in the array
+     * @param array $array
+     * @param type $key
+     * @return type
+     */
+    public static function total(array $array, $key){
+        
+        $sum = 0;
+        
+        foreach($array as $element => $values){
+            $sum += (array_key_exists($key, $values)) ? $values[$key] : 0;
+        }
+        
+        return $sum;
         
     }
     
@@ -540,6 +557,32 @@ abstract class Arr
             
         }
        
+        return $array;
+        
+    }
+    
+    /**
+     * Insert a value into an indexed array
+     * @param array $array
+     * @param type $value
+     * @param type $position
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    public static function insert(array &$array, $value, $position = null){
+        
+        $cnt = count($array);
+        if (is_null($position)){
+            $position = $cnt - 1;
+        }
+        
+        // Make sure the position is valid
+        if (abs($position) > $cnt){
+            throw new \InvalidArgumentException('Array position out of bounds');
+        }
+        
+        array_splice($array, $position, 0, $value);        
+        
         return $array;
         
     }

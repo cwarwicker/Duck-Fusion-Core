@@ -3,9 +3,7 @@ TODO:
 - FTPStore and FTPFile - Finish classes
 - Update all method comments
 - Arr class
-    - insert($array, 'New Element', $position)
     - delete($array, 'people.alex')
-    - sum($array['people'], 'age')
 - Crons
     - Cron script to configure and run things like App:rc() and any other automated tasks
     - Cron.php should just have an array of crons to run, with the path and repetition

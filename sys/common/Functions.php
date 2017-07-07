@@ -149,7 +149,7 @@ function df_call_routing(){
 function df_setup(){
     
     global $cfg, $db;
-        
+            
     // Register Error Handler first, so that can be used if there are any errors in the setup
     if ($cfg->env == 'dev' && class_exists('\Whoops\Run')){
         $whoops = new \Whoops\Run();
@@ -165,11 +165,13 @@ function df_setup(){
     // Start the DF session
     \DF\Helpers\Session::init();
         
-    // If an evnrionment is set, use that, otherwise we'll assume live to be safe
+    // If an environment is set, use that, otherwise we'll assume live to be safe
     if (!isset($cfg->env)){
         $cfg->env = 'live';
     }
-            
+       
+    
+    // If we are using one of the 2 default environments, load them
     switch($cfg->env)
     {
 
@@ -185,12 +187,31 @@ function df_setup(){
         break;
 
         case 'live':
-        default:
             error_reporting(E_ALL);
             ini_set("display_errors", 0);
             ini_set("log_errors", 1);
             ini_set("error_log", df_APP_ROOT . df_DS . 'tmp' . df_DS . 'logs' . df_DS . 'error.log');
         break;
+    
+        case 'custom':
+            
+            // Check for a defined environment, based on server hostname
+            if (file_exists(df_APP_ROOT . df_DS . 'config' . df_DS . 'Env.php')){
+
+                include_once df_APP_ROOT . df_DS . 'config' . df_DS . 'Env.php';
+
+                $hostname = gethostname();
+
+                // If the $Env variable is set, check for this hostname
+                if (isset($Env) && array_key_exists($hostname, $Env) && is_callable($Env[$hostname])){
+                    call_user_func($Env[$hostname]);
+                }
+
+            }
+            
+        break;
+    
+    
     }
     
     
@@ -718,14 +739,14 @@ function string_cycle($str, $name = '', $delim = ',')
 
 
 
- /**
- * Work out the average of all the elements in the array
+/**
+ * Total up the values of a given key in the array and work out an average
  * @param array $array
- * @param \Closure $function If this is passed in, then if any elements in the array are arrays or objects, this Closure will be called to return the value you want from it
+ * @param type $key
  * @return type
  */
-function array_average(array $array, \Closure $function = null){
-    return \DF\Helpers\Arr::avg($array, $function);
+function array_average(array $array, $key){
+    return \DF\Helpers\Arr::avg($array, $key);
 }
     
 /**
@@ -852,4 +873,27 @@ function array_sort(&$array, $order, $sortBy = \DF\Helpers\Arr::ARR_SORT_BY_VALU
  */
 function array_set(&$array, $key, $val){
     return \DF\Helpers\Arr::set($array, $key, $val);
+}
+
+/**
+ * Total up the values of a given key in the array
+ * @param array $array
+ * @param type $key
+ * @return type
+ */
+function array_total(array &$array, $key){
+    return \DF\Helpers\Arr::total($array, $key);
+}
+
+
+/**
+ * Insert a value into an indexed array
+ * @param array $array
+ * @param type $value
+ * @param type $position
+ * @return array
+ * @throws \InvalidArgumentException
+ */
+function array_insert(array &$array, $value, $position = null){
+    return DF\Helpers\Arr::insert($array, $value, $position);
 }

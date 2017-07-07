@@ -63,9 +63,10 @@ $cfg->title = '%title%';
 // This should contain the name of the author of the application
 $cfg->author = '';
 
-// This should contain the default environment to use, if different environment configurations have not been setup
+// This should contain the default environment to use
 // The value 'dev' will log and display all errors
 // The value 'live' will log all errors, but display none to the users
+// The value 'custom' means you will setup environments yourself based on the server hostname, in the config/Env.php file
 $cfg->env = 'dev';
 
 // This should contain the default character set you wish to set in the header for each web page
