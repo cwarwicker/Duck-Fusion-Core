@@ -2,7 +2,7 @@
 
 header
 {
-    background: #1e2431;
+    background: #00AEFF;
     color: #fff;
     height: 150px;
     padding: 10px;
@@ -42,5 +42,5 @@ footer
 {
     text-align: center;
     font-size: 10pt;
-    margin-top: 30px;
+    margin-top: 20px;
 }

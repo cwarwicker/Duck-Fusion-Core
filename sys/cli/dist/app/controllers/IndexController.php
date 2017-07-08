@@ -22,7 +22,7 @@
  *
  * IndexController
  * 
- * this is the default Controller for your application
+ * This is the default Controller for your application
  *
  * @copyright    Copyright (c) 2017 Conn Warwicker
  * @package      DuckFusion
