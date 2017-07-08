@@ -672,7 +672,7 @@ function df_convert_url(&$url){
  * @return type
  */
 function string_cut($str, $length, $append = ''){
-    return \DF\Helpers\Strings::cut($str, $length, $append);
+    return \DF\Helpers\Str::cut($str, $length, $append);
 }
 
 /**
@@ -682,7 +682,7 @@ function string_cut($str, $length, $append = ''){
  * @return type
  */
 function string_rand($length = false, $chars = false){
-    return \DF\Helpers\Strings::rand($length, $chars);
+    return \DF\Helpers\Str::rand($length, $chars);
 }
 
 /**
@@ -693,7 +693,7 @@ function string_rand($length = false, $chars = false){
 */
 function string_begins($haystack, $needle)
 {
-    return \DF\Helpers\Strings::begins($haystack, $needle);
+    return \DF\Helpers\Str::begins($haystack, $needle);
 }
  
 /**
@@ -704,7 +704,7 @@ function string_begins($haystack, $needle)
 */
 function string_ends($haystack, $needle)
 {
-    return \DF\Helpers\Strings::ends($haystack, $needle);
+    return \DF\Helpers\Str::ends($haystack, $needle);
 }
  
 /**
@@ -715,7 +715,7 @@ function string_ends($haystack, $needle)
 */
 function string_contains($haystack, $needle)
 {
-    return \DF\Helpers\Strings::contains($haystack, $needle);
+    return \DF\Helpers\Str::contains($haystack, $needle);
 }
 
 /**
@@ -725,12 +725,28 @@ function string_contains($haystack, $needle)
  */
 function string_increment($str)
 {
-    return \DF\Helpers\Strings::increment($str);
+    return \DF\Helpers\Str::increment($str);
 }
 
-function string_cycle($str, $name = '', $delim = ',')
+/**
+ * Cycle through a list of strings, getting the next one each time this is called
+ * Example:
+ * 
+ *  $colours = 'white,red,blue';
+ *  foreach($tableRows as $row)
+ *  {
+ *      $rowColour = Str::cycle($colours, 'colour', ',');
+ *  }
+ * 
+ *  This will alternate between white, red and blue and continue to loop through them each time it is called
+ * @param type $str The string to cycle through, using the delim to split it
+ * @param type $delim Default separator is a comma
+ * @param type $id An id is only needed if you are for some reason calling cycle on the same string on the same line of the script, but want multiple versions of the results
+ * @return type
+ */
+function string_cycle($str, $delim = ',', $id = '')
 {
-    return \DF\Helpers\Strings::cycle($str, $name, $delim);
+    return \DF\Helpers\Str::cycle($str, $delim, $id);
 }
 
 
@@ -757,6 +773,16 @@ function array_average(array $array, $key){
  */
 function array_find(array $array, $find){
     return \DF\Helpers\Arr::find($array, $find);
+}
+
+ /**
+ * Delete an element from a multi-dimensional array, using dot notation
+ * @param array $array
+ * @param type $key
+ * @return boolean
+ */
+function array_delete(array &$array, $key){
+    return \DF\Helpers\Arr::delete($array, $key);
 }
 
 /**

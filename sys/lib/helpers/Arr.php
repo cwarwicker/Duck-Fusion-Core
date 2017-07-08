@@ -313,10 +313,36 @@ abstract class Arr
         
     }
     
-    
+    /**
+     * Delete an element from a multi-dimensional array, using dot notation
+     * @param array $array
+     * @param type $key
+     * @return boolean
+     */
     public static function delete(array &$array, $key){
+                                
+        $split = explode('.', $key);
+        if ($split && array_key_exists($split[0], $array))
+        {
+            
+            // Take next element off the dot notation converted array
+            $next = array_shift($split);
+            
+            // If there are still more levels to go down, call delete() again
+            if (!empty($split))
+            {
+                return self::delete($array[$next], implode('.', $split));
+            }
+            
+            // This is the last element, so this is the one we want to delete
+            else
+            {
+                unset($array[$next]);
+            }
+            
+        }
         
-        // todo
+        return true;
         
     }
     

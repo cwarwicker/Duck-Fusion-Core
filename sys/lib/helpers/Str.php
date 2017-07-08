@@ -35,7 +35,7 @@
 
 namespace DF\Helpers;
 
-abstract class Strings
+abstract class Str
 {
     
     /**
@@ -45,9 +45,7 @@ abstract class Strings
     * @return type
     */
     public static function cut($str, $length, $append = ''){
-        
         return ( strlen($str) > $length ) ? substr($str, 0, $length) . $append : $str;
-        
     }
     
     
@@ -192,18 +190,27 @@ abstract class Strings
     
     /**
      * Cycle through a list of strings, getting the next one each time this is called
-     * Example use: Alternate table row colours
-     * @param type $str
-     * @param type $id
-     * @param type $delim
+     * Example:
+     * 
+     *  $colours = 'white,red,blue';
+     *  foreach($tableRows as $row)
+     *  {
+     *      $rowColour = Str::cycle($colours, 'colour', ',');
+     *  }
+     * 
+     *  This will alternate between white, red and blue and continue to loop through them each time it is called
+     * 
+     * @param type $str The string to cycle through, using the delim to split it
+     * @param type $delim Default separator is a comma
+     * @param type $id An id is only needed if you are for some reason calling cycle on the same string on the same line of the script, but want multiple versions of the results
      * @return type
      */
-    public static function cycle($str, $id = '', $delim = ',')
+    public static function cycle($str, $delim = ',', $id = '')
     {
         
         $backtrace = debug_backtrace();
         $script = $backtrace[1]['file'] . ':' . $backtrace[1]['line'];
-                
+                        
         $array = explode($delim, $str);
         if ($array)
         {
@@ -213,7 +220,7 @@ abstract class Strings
             if (strlen($id) > 0){
                 $name .= '-' . $id;
             }
-            
+                        
             if (isset($GLOBALS[$name])){
                 $array = $GLOBALS[$name];
             } 

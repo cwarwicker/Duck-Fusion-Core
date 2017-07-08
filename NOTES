@@ -1,21 +1,18 @@
 TODO:
 
-- Arr class
-    - delete($array, 'people.alex')
 - Crons
     - Cron script to configure and run things like App:rc() and any other automated tasks
     - Cron.php should just have an array of crons to run, with the path and repetition
     - Store last ran info for each cron in the config_table
-- CLI - Redo the CLI or use an existing php library, as its not very good
-- Error logging - Exception handling, logging to files, etc...
+
 
 
 
 IDEAS:
 
 - Models - ORM
-
-
+- CLI - Redo the CLI to allow for user input, so we can do things like define web address on creation of app
+- Data format converter - convert between array, csv, xml, json, etc...
 
 
 
