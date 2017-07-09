@@ -55,7 +55,7 @@ abstract class Controller {
     public function __construct($module) {
         
         global $cfg, $User;
-                
+                        
         // Do we need to be logged in to use this Controller?
         if ($this->requireAuth){
             

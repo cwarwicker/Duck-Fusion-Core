@@ -118,9 +118,7 @@ abstract class FormElement {
     }
     
     public function validate(\DF\Helpers\Validation $validator, $data){
-        
-        echo "Field: $this->name<br>";
-        
+                
         $result = $validator->validate( array($this->name => $data), array($this->name => $this->validation) );       
         
         // If it's an array, it's the array of errors

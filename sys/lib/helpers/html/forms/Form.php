@@ -221,6 +221,23 @@ class Form {
     }
     
     /**
+     * Set the value of one of the fields
+     * @param type $name
+     * @param type $value
+     * @return $this
+     */
+    public function set($name, $value){
+        
+        $field = $this->getField($name);
+        if ($field){
+            $field->value = $value;
+        }
+        
+        return $this;
+        
+    }
+    
+    /**
      * Get the submitted data from the form, if there is any
      * @return boolean
      */
@@ -371,6 +388,25 @@ class Form {
         
     }
     
-   
+    /**
+     * Sticky the submitted data back into the fields, so it is displayed in the form again
+     * @param type $data
+     */
+    public function sticky($data = null){
+        
+        if (is_null($data)){
+            $data = $this->data();
+        }
+        
+        // Set submitted value back into each element
+        if ($this->fields){
+            foreach($this->fields as $field){
+                if (isset($data[$field->name])){
+                    $field->value = $data[$field->name];
+                }
+            }
+        }
+        
+    }
     
 }

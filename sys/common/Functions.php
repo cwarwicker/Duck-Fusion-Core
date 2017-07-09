@@ -256,13 +256,16 @@ function df_setup(){
                 }
         
     }
-    
+        
     // If we have a database connection, check out Config.php file for any extras we want to load
     if ( (isset($db) && $db) && isset($cfg->config_table) ){
-        
+                
         // Temporarily set the fetch mode for the this query, then reset it afterwards
         $db->get()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_KEY_PAIR);
-        $cfg->config = (object)$db->selectAll($cfg->config_table)->all();
+        $results = $db->selectAll($cfg->config_table);
+        if ($results){
+            $cfg->config = (object)$results->all();
+        }
         $db->get()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
         
     }
