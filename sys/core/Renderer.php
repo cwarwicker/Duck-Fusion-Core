@@ -428,7 +428,7 @@ abstract class Renderer {
                 $this->serve($result['file']);
                 
                 // Delete it as it's just a tmp file we won't use again, since we haven't said to cache any of this
-                unlink($result['file']);
+                #unlink($result['file']);
                 
             }
             

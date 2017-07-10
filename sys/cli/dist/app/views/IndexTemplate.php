@@ -36,6 +36,8 @@ namespace DF\App\%ns%;
 
 class IndexTemplate extends \DF\Template {
 
+    public function main($args){
         
+    }
 
 }

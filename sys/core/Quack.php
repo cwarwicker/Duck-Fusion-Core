@@ -38,6 +38,7 @@
 // - Will leave with /U flag for now, but needs fixing
 // - [[noparse]] doesn't work properly, if you are inside a tag and you are parsing the end of that tag, e.g. [[section:a]][[noparse]][[section:b]]hi[[endsection]][[endnoparse]][[endsection]]
 // - switch case doesn't work unless first case is at the beginning of line. Any spaces or tabs cause an error. Need to strip any whitespace between them.
+// - If statements don't work inline, if there are braces () inside the condition, e.g. @if(true) {{something()}} @endif
 
 namespace DF;
 
