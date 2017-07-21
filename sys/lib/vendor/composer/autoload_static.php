@@ -25,10 +25,6 @@ class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
         array (
             'Psr\\Log\\' => 8,
         ),
-        'M' => 
-        array (
-            'Monolog\\' => 8,
-        ),
         'L' => 
         array (
             'League\\Event\\' => 13,
@@ -47,10 +43,6 @@ class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
         'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
-        ),
-        'Monolog\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
         'League\\Event\\' => 
         array (
