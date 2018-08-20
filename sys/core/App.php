@@ -58,9 +58,11 @@ class App {
      */
     public static function loadClass($name){
                 
-        $namespace = dirname($name);
-        $class = basename($name);
-                               
+        
+        $namespace = df_get_class_namespace($name);
+        $class = df_get_class_name($name);
+        
+                        
         // Is it a helper?
         if (strpos($namespace, 'DF\Helpers') === 0){
             $path = str_replace('DF\Helpers', '', $namespace);
@@ -70,10 +72,13 @@ class App {
         
         // Is it an exception?
         elseif (strpos($namespace, 'DF\Exceptions') === 0){
+            \df_log("yeah it's an exception");
             $path = str_replace('DF\Exceptions', '', $namespace);
             $file = df_SYS . 'core' . df_DS . 'Exceptions' . df_DS . $class . '.php';
             require_once $file;
         }
+        
+        
         
     }
     

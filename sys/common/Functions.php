@@ -634,9 +634,14 @@ function df_convert_url(&$url){
     
 }
 
+function df_get_class_namespace($class) {
+    return join(array_slice(explode("\\", $class), 0, -1), "\\");
+}
 
-
-
+function df_get_class_name($class){
+    $explode = explode("\\", $class);
+    return array_pop($explode);
+}
 
 
 

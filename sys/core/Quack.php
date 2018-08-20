@@ -274,9 +274,7 @@ class Quack extends Renderer {
                 
                 // If we have that section put it here instead
                 if (isset($this->sections[$name])){
-
                     $content = str_replace($import, $this->sections[$name], $content);
-
                 }
                 
             }

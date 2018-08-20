@@ -48,20 +48,14 @@ class CLI
      */
     public $commands = array(
         
-        'create-application' => 'create-application',
-        'create-app' => 'create-application',
+        'create' => 'create-application',
+        'delete' => 'delete-application',
         
-        'delete-application' => 'delete-application',
-        'delete-app' => 'delete-application',
-        
-        'add-module' => 'add-module',
         'add-mod' => 'add-module',
-        
-        'delete-module' => 'delete-module',
         'delete-mod' => 'delete-module',
         
         'commands' => 'list-commands',
-        'list-commands' => 'list-commands'
+        'help' => 'list-commands'
         
     );
     
@@ -302,11 +296,18 @@ class CLI
         $this->mod = preg_replace("/[^a-z 0-9 \-_]/i", "", $module);
         $this->ns = $this->getAppNameSpace();
         
+        // If either of them are missing, stop
+        if ($this->app == "" || $this->mod == ""){
+            echo "Error: Invalid parameters detected\n";
+            echo "Make sure you specify the name of the application and the name of the module, e.g. `app-mod MyApp MyModule`\n";
+            exit;
+        }
+        
         // Make sure module directory doesn't already exist
         $dir = df_ROOT . 'app' . df_DS . $this->app . df_DS . 'modules' . df_DS . $this->mod . df_DS;
         if (is_dir($dir)){
             echo "Error: Directory {$dir} already exists\n";
-            echo "Either choose a new name for your module, or remove the existing directory\n\n";
+            echo "Either choose a new name for your module, or remove the existing directory\n";
             exit;
         }
         
@@ -345,32 +346,31 @@ class CLI
         $confirmed = (isset($param[2]) && strtolower($param[2]) == '-y');
         
         if (!$this->app || !$this->mod){
-            echo "Error: Invalid parameter\n\n";
-            self::displayHelp();
+            echo "Error: Invalid parameters detected\n";
             exit;
         }
         
         // Make sure directory exists
         $dir = df_ROOT . 'app' . df_DS . $this->app . df_DS . 'modules' . df_DS . $this->mod;
         if (!is_dir($dir)){
-            echo "Error: Directory {$dir} does not exist\n\n";
+            echo "Error: Directory {$dir} does not exist\n";
             exit;
         }
         
         // Is it confirmed?
         if (!$confirmed){
             echo "Confirmation: Running this command will completely destroy the {$dir} directory...\n";
-            echo "To confirm that you are happy to do this, please append the '-y' flag to the end, e.g. 'delete-application {$this->app} -y'\n\n";
+            echo "To confirm that you are happy to do this, please append the '-y' flag to the end, e.g. 'delete-application {$this->app} -y'\n";
             exit;
         }
         
         // Delete the directory
         if (!$this->deleteDirectory($dir)){
-            echo "Error: Unable to delete directory {$dir}. Sorry!\n\n";
+            echo "Error: Unable to delete directory {$dir}. Sorry!\n";
             exit;
         }
         
-        echo "Module {$this->mod} successfully deleted from application {$this->app}!\n\n";
+        echo "Module {$this->mod} successfully deleted from application {$this->app}!\n";
         
     }
     
@@ -625,7 +625,7 @@ class CLI
         
         $output .= "Proper usage: php duckfusion.php action parameter\n\n";
         $output .= "e.g. php duckfusion.php create-app MyTestApp\n\n";
-        $output .= "type: 'php duckfusion.php commands' for a list of commands";
+        $output .= "type: 'php duckfusion.php commands' for a list of commands\n";
         
         echo $output;
         exit;
@@ -636,7 +636,7 @@ class CLI
 
 // Get the user input
 $action = (isset($_SERVER['argv'][1])) ? $_SERVER['argv'][1]: false;
-$param = (count($_SERVER['argv'] > 2)) ? array_slice($_SERVER['argv'], 2): false;
+$param = (count($_SERVER['argv']) > 2) ? array_slice($_SERVER['argv'], 2): false;
 
 // Check they have actually supplied an action
 if (!$action){
