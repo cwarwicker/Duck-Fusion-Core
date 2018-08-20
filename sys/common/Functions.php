@@ -112,7 +112,7 @@ function df_call_routing(){
         'uri' => $_SERVER['REQUEST_URI'],
         'method' => $_SERVER['REQUEST_METHOD']
     ) );
-            
+                
     // If we returned an array, then it should contain the controller and method
     if (is_array($resolve)){
         
@@ -136,7 +136,7 @@ function df_call_routing(){
         $action = 'main';
     }
         
-    $Controller->setAction($action);
+    $Controller->setAction($action, $resolve['method']);
     $Controller->setParams($arguments);
     $Controller->run();
     $Controller->getTemplate()->render();    
@@ -176,6 +176,7 @@ function df_setup(){
     {
 
         case 'dev':
+            
             error_reporting(E_ALL);
             ini_set("display_errors", 1);
             ini_set("log_errors", 1);
@@ -262,7 +263,7 @@ function df_setup(){
                 
         // Temporarily set the fetch mode for the this query, then reset it afterwards
         $db->get()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_KEY_PAIR);
-        $results = $db->selectAll($cfg->config_table);
+        $results = $db->selectAll($cfg->config_table, array(), null, 'setting,value');
         if ($results){
             $cfg->config = (object)$results->all();
         }

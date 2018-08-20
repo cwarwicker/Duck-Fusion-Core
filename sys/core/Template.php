@@ -68,9 +68,10 @@ class Template {
         $this->module = $module;
         
         // Set the global variables to be accessible in every template and then set their names to be reserved so they cannot be overwritten
+        $this->set("TPL", $this);
         $this->set("cfg", $cfg);
         $this->set("User", $User);
-        $this->reserved = array('cfg', 'User');
+        $this->reserved = array('cfg', 'User', 'TPL');
         
     }
     
@@ -196,6 +197,10 @@ class Template {
     
     public function getModule(){
         return $this->module;
+    }
+    
+    public function getController(){
+        return $this->controller;
     }
     
     public function getAction(){

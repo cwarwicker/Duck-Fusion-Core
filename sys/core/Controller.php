@@ -50,7 +50,7 @@ abstract class Controller {
     
     // Look at this authentication thing - don't know if it really does anything yet
     protected $requireAuth = false;
-    protected $requireAuthenticationRedirect = '';
+    protected $requireAuthRedirect = '';
 
     public function __construct($module) {
         
@@ -61,7 +61,7 @@ abstract class Controller {
             
             // If the $User variable is not set (which should be set in the application's Session.php file), redirect
             if (!$User){
-                Router::go($cfg->www . '/' . $this->requireAuthenticationRedirect);
+                Router::go($cfg->www . '/' . $this->requireAuthRedirect);
             }
             
         }
@@ -136,12 +136,20 @@ abstract class Controller {
      * @param type $action
      * @return $this
      */
-    public function setAction($action){
+    public function setAction($action, $method = null){
+        
         $action = str_replace('-', '_', $action);
+        
+        if ($method !== 'GET' && method_exists($this, "{$action}_{$method}")){
+            $action .= "_{$method}";
+        }
+        
         $this->action = $action;
+        
         if ($this->template){
             $this->template->setAction($action);
         }
+                
         return $this;
     }
     

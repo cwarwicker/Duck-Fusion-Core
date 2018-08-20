@@ -147,7 +147,7 @@ class Router extends \Szenis\Router {
                                 
             $return['controller'] = $this->getNamespace() . $this->getDefault('Controller');
             $return['action'] = $this->defaults['Action'];
-            
+            $return['method'] = $request['method'];
             return $return;
             
         } else {
@@ -240,6 +240,7 @@ class Router extends \Szenis\Router {
             $return['action'] = $action;
             $return['arguments'] = $arguments;
             $return['module'] = $module;
+            $return['method'] = $request['method'];
             
             return $return;
             

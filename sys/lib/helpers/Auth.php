@@ -37,13 +37,10 @@ namespace DF\Helpers;
 class Auth
 {
     
-    const DEFAULT_METHOD = 'sha512';
+    const DEFAULT_METHOD = PASSWORD_ARGON2I;
     
-    protected $password;
-    protected $salt = null;
-    protected $usePepper = true;
+    protected $password = null;
     protected $method = self::DEFAULT_METHOD;
-    
     protected $db = null;
 
 
@@ -55,28 +52,12 @@ class Auth
     }
     
     public function setPassword($val){
-        $this->password = $val;
+        $this->password = trim($val);
         return $this;
     }
     
     public function getPassword(){
         return $this->password;
-    }
-    
-    public function setSalt($salt = null){
-        $this->salt = $salt;
-        return $this;
-    }
-    
-    public function getSalt(){
-        return $this->salt;
-    }
-    
-    public function usePepper($val){
-        if (is_bool($val)){
-            $this->usePepper = $val;
-        }
-        return $this;
     }
     
     public function setMethod($method){
@@ -88,6 +69,7 @@ class Auth
         return $this->method;
     }
     
+        
     /**
      * 
      * @global \DF\Helpers\type $cfg
@@ -122,12 +104,7 @@ class Auth
                 $return['message'] = \df_string('errors:invalidlogin');
                 return $return;
             }
-            
-            // Set the user salt, if we have/want one
-            if ($this->salt !== false && isset($user->salt)){
-                $this->setSalt($user->salt);
-            }
-                                    
+                                                
             // We know that the user exists with that ident, so now let's check if the password matches
             if (!$this->compare($user->password)){
                 $return['message'] = \df_string('errors:invalidlogin');
@@ -155,6 +132,10 @@ class Auth
         
         return $return;
         
+    }
+    
+    public function logout(){
+        return \DF\Helpers\Session::destroy();
     }
     
     /**
@@ -196,8 +177,18 @@ class Auth
             return false;
         }
         
-        $user->_uid = $id;
         return $user;
+        
+    }
+    
+    /**
+     * Get the currently authenticated user
+     * @return type
+     */
+    public function getLoggedInUser(){
+        
+        $id = \DF\Helpers\Session::read( \DF\Helpers\Auth::getSessionKey() );
+        return $this->getUser($id);
         
     }
     
@@ -217,46 +208,18 @@ class Auth
     }
     
     /**
-     * Hashes a specified password (setPassword) with a specified algorithm (setMethod or use the default)
+     * Hashes a specified password (setPassword)
      * Returns a hashed string on success, or FALSE on error
      * @return mixed
      * @throws \DF\DFException
      */
     public function hash(){
         
-        if (!$this->password || !$this->method){
+        if (!$this->password){
             return false;
-        }
-        
-        $password = $this->password;
-        
-        $methods = hash_algos();
-        if (!in_array($this->method, $methods)){
-            \DF\Exceptions\AuthenticationException::invalidHashAlgorithm($this->method);
-            return false;
-        }
-        
-        // Salt - If null, that means generate a random one, if false that means don't use one, otherwise use whatever is supplied (if it's a string)
-        if (is_null($this->salt)){
-            $this->salt = \DF\Helpers\Strings::rand( mt_rand(8, 16) );
-            $password .= $this->salt;
-        } elseif (is_string($this->salt) && strlen($this->salt) > 0){
-            $password .= $this->salt;
-        }
-        
-        // Pepper
-        if (strlen($this->salt) > 0 && $this->usePepper === true){
-            
-            // Take the first and last letter of the salt and add them to the front of the password string
-            $letters = array();
-            $letters[0] = substr($this->salt, 0, 1);
-            $letters[1] = substr($this->salt, -1, 1);
-            $password = $letters[0] . $letters[1] . $password;
-            
         }
                 
-        // Now hash it
-        return hash($this->method, $password);
+        return password_hash($this->password, $this->method);
         
     }
     
@@ -265,15 +228,8 @@ class Auth
      * @param type $dbHash
      * @return boolean
      */
-    public function compare($dbHash){
-                        
-        $hash = $this->hash();
-        if (!$hash){
-            return false;
-        }
-                
-        return ($hash === $dbHash);
-        
+    public function compare($stored){
+        return (password_verify($this->password, $stored));
     }
     
         
@@ -282,8 +238,6 @@ class Auth
      */
     public function reset(){
         $this->password = null;
-        $this->salt = null;
-        $this->usePepper = true;
         $this->method = self::DEFAULT_METHOD;
     }
     
