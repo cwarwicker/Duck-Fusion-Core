@@ -36,6 +36,7 @@ namespace DF;
 
 abstract class Renderer {
 
+    protected $TPL = null;
     protected $vars = array();
     protected $cache = false;
     protected $cache_life = 0;
@@ -79,6 +80,14 @@ abstract class Renderer {
      */
     public function setVars($vars){
         $this->vars = $vars;
+    }
+    
+    /**
+     * Set reference to the Template object
+     * @param type $TPL
+     */
+    public function setTpl($TPL){
+        $this->TPL = $TPL;
     }
     
     /**

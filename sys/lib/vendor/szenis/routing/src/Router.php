@@ -63,7 +63,7 @@ class Router implements RouterInterface
 	 *
 	 * @param  string $url
 	 * @param  mixed  $action
-	 * 
+	 *
 	 * @return void
 	 */
 	public function get($url, $action)
@@ -76,7 +76,7 @@ class Router implements RouterInterface
 	 *
 	 * @param  string $url
 	 * @param  mixed  $action
-	 * 
+	 *
 	 * @return void
 	 */
 	public function post($url, $action)
@@ -89,7 +89,7 @@ class Router implements RouterInterface
 	 *
 	 * @param  string $url
 	 * @param  mixed  $action
-	 * 
+	 *
 	 * @return void
 	 */
 	public function put($url, $action)
@@ -102,7 +102,7 @@ class Router implements RouterInterface
 	 *
 	 * @param  string $url
 	 * @param  mixed  $action
-	 * 
+	 *
 	 * @return void
 	 */
 	public function patch($url, $action)
@@ -115,7 +115,7 @@ class Router implements RouterInterface
 	 *
 	 * @param  string $url
 	 * @param  mixed  $action
-	 * 
+	 *
 	 * @return void
 	 */
 	public function delete($url, $action)
@@ -146,7 +146,7 @@ class Router implements RouterInterface
 	 * @return void
 	 */
 	public function add($url, $method, $action)
-	{	
+	{
 		$route = $this->factory->create($url, $method, $action);
 		$route->setNamespace($this->namespace);
 
@@ -166,7 +166,7 @@ class Router implements RouterInterface
 	{
 		$this->namespace = $namespace;
 	}
-        
+
         /**
          * Get namespace
          * @return string $namespace

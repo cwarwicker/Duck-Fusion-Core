@@ -7,9 +7,9 @@ namespace Composer\Autoload;
 class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
 {
     public static $files = array (
+        '3917c79c5052b270641b5a200963dbc2' => __DIR__ . '/..' . '/kint-php/kint/init.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         'da253f61703e9c22a5a34f228526f05a' => __DIR__ . '/..' . '/wixel/gump/gump.class.php',
-        '3917c79c5052b270641b5a200963dbc2' => __DIR__ . '/..' . '/kint-php/kint/init.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -47,6 +47,16 @@ class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
         'League\\Event\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/event/src',
+        ),
+    );
+
+    public static $prefixesPsr0 = array (
+        'P' => 
+        array (
+            'Parsedown' => 
+            array (
+                0 => __DIR__ . '/..' . '/erusev/parsedown',
+            ),
         ),
     );
 
@@ -136,6 +146,7 @@ class ComposerStaticInitd7eef99b2edd1dea039534a468b96d81
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitd7eef99b2edd1dea039534a468b96d81::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitd7eef99b2edd1dea039534a468b96d81::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitd7eef99b2edd1dea039534a468b96d81::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitd7eef99b2edd1dea039534a468b96d81::$classMap;
 
         }, null, ClassLoader::class);

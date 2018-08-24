@@ -21,7 +21,7 @@
 /**
  *
  * Authentication
- * 
+ *
  * This Helper class provides various methods for working with authentication, such as password hashing, comparison, salting, etc...
  *
  * @copyright    Copyright (c) 2017 Conn Warwicker
@@ -36,108 +36,108 @@ namespace DF\Helpers;
 
 class Auth
 {
-    
+
     const DEFAULT_METHOD = PASSWORD_ARGON2I;
-    
+
     protected $password = null;
     protected $method = self::DEFAULT_METHOD;
     protected $db = null;
 
 
     public function __construct(){
-        
+
         global $db;
         $this->db = $db;
-        
+
     }
-    
+
     public function setPassword($val){
         $this->password = trim($val);
         return $this;
     }
-    
+
     public function getPassword(){
         return $this->password;
     }
-    
+
     public function setMethod($method){
         $this->method = $method;
         return $this;
     }
-    
+
     public function getMethod(){
         return $this->method;
     }
-    
-        
+
+
     /**
-     * 
+     *
      * @global \DF\Helpers\type $cfg
      * @param type $ident
      * @param type $password
      * @return type
      */
     public function login($ident, $password){
-        
+
         global $cfg;
-        
+
         // Set the password into the auth object for later use
         $this->password = $password;
-                        
+
         $return = array('result' => false);
-        
+
         // Check if configuration details are stored to enable us to try and authenticate
         if (!is_null(@$cfg->config->user_table) && !is_null(@$cfg->config->user_identfield)){
-                        
+
             // First see if the user exists at all
             $uID = $this->getUID( $ident );
             if (!$uID){
                 $return['message'] = \df_string('errors:invalidlogin');
                 return $return;
             }
-            
+
             // Get the full user record
             $user = $this->getUser($uID);
-            
+
             // Check it's not been deleted
             if ($user->deleted != 0){
                 $return['message'] = \df_string('errors:invalidlogin');
                 return $return;
             }
-                                                
+
             // We know that the user exists with that ident, so now let's check if the password matches
             if (!$this->compare($user->password)){
                 $return['message'] = \df_string('errors:invalidlogin');
                 return $return;
             }
-            
+
             // Now check if the user has been confirmed
             if ($user->confirmed != 1){
                 $return['message'] = \df_string('errors:userunconfirmed');
                 return $return;
             }
-            
+
             // At this point, everything should be ok, so set the user in a session
             if (!($session = $this->addSession($uID))){
                 $return['message'] = \df_string('errors:syserror');
                 return $return;
             }
-            
+
             $return['session'] = $session;
             $return['result'] = true;
-                        
+
         } else {
             $return['message'] = \df_string('errors:invaliduserconfig');
         }
-        
+
         return $return;
-        
+
     }
-    
+
     public function logout(){
         return \DF\Helpers\Session::destroy();
     }
-    
+
     /**
      * Check if the user is logged in (if the session key for this site is set)
      * @return type
@@ -145,8 +145,8 @@ class Auth
     public function isLoggedIn(){
         return (\DF\Helpers\Session::read( self::getSessionKey() ) !== false);
     }
-    
-    
+
+
     /**
      * Write the session data
      * @global \DF\Helpers\type $cfg
@@ -154,14 +154,14 @@ class Auth
      * @return type
      */
     protected function addSession($uID){
-                
+
         $key = self::getSessionKey();
 
         // Write to the actual session
         return \DF\Helpers\Session::write($key, $uID);
-        
+
     }
-    
+
     /**
      * Get a user record from its id
      * @global \DF\Helpers\type $cfg
@@ -169,29 +169,28 @@ class Auth
      * @return boolean
      */
     protected function getUser($id){
-        
+
         global $cfg;
-        
+
         $user = $this->db->select($cfg->config->user_table, array('id' => $id));
         if (!$user){
             return false;
         }
-        
+
         return $user;
-        
+
     }
-    
+
     /**
      * Get the currently authenticated user
      * @return type
      */
-    public function getLoggedInUser(){
-        
-        $id = \DF\Helpers\Session::read( \DF\Helpers\Auth::getSessionKey() );
-        return $this->getUser($id);
-        
+    public function getLoggedInUserID(){
+
+        return \DF\Helpers\Session::read( \DF\Helpers\Auth::getSessionKey() );
+
     }
-    
+
     /**
      * Get the id of a user record from its ident
      * @global type $cfg
@@ -199,14 +198,14 @@ class Auth
      * @return type
      */
     protected function getUID($ident){
-        
+
         global $cfg;
-        
+
         $user = $this->db->select($cfg->config->user_table, array($cfg->config->user_identfield => $ident), null, 'id');
         return ($user) ? $user->id : false;
-        
+
     }
-    
+
     /**
      * Hashes a specified password (setPassword)
      * Returns a hashed string on success, or FALSE on error
@@ -214,15 +213,15 @@ class Auth
      * @throws \DF\DFException
      */
     public function hash(){
-        
+
         if (!$this->password){
             return false;
         }
-                
+
         return password_hash($this->password, $this->method);
-        
+
     }
-    
+
     /**
      * Hash a password using the specified password, salt and method and then compare it to a given hash (most likely from your users database table)
      * @param type $dbHash
@@ -231,8 +230,8 @@ class Auth
     public function compare($stored){
         return (password_verify($this->password, $stored));
     }
-    
-        
+
+
     /**
      * Reset the properties on the object
      */
@@ -240,8 +239,8 @@ class Auth
         $this->password = null;
         $this->method = self::DEFAULT_METHOD;
     }
-    
-    
+
+
     /**
      * Get the key used for the sessions on this site
      * @global \DF\Helpers\type $cfg
@@ -251,6 +250,6 @@ class Auth
         global $cfg;
         return $cfg->config->session_name . '__' . $cfg->config->site_token;
     }
-    
-    
+
+
 }

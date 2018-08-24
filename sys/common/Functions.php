@@ -21,7 +21,7 @@
 /**
  *
  * Common Functions
- * 
+ *
  * These are all the global functions which may be used across the system/applications
  *
  * @copyright    Copyright (c) 2017 Conn Warwicker
@@ -39,7 +39,10 @@ const DF_PAGINATION_RANGE = 3;
 /**
  * Stop the script running and push out any output that's in the buffer
  */
-function df_stop(){
+function df_stop($msg = null){
+    if (!is_null($msg)){
+      echo $msg;
+    }
     ob_end_flush();
     exit;
 }
@@ -49,39 +52,39 @@ function df_stop(){
  * @param string $string The string to get
  * @param bool $app Are we looking in the application lang file or the system one, default is false
  * @param string $language Shortcode for language, default is 'en'
- * @return string 
+ * @return string
  */
 function df_string($string, $app = false, $language = null){
-    
+
     global $cfg;
-    
+
     // If language is set use that, otherwise use the default in the configuration file, otherwise just use english
     if (is_null($language)){
         $language = (isset($cfg->locale)) ? $cfg->locale : 'en';
     }
-    
+
     // if using our application's language file, get that, otherwise get the systemone
     if ($app){
         $file = df_APP_ROOT . df_DS . 'lang' . df_DS . $language . df_DS . 'lang.php';
     } else {
         $file = df_SYS . 'lang' . df_DS . $language . df_DS . 'lang.php';
     }
-    
+
     // if the lang file exists, include it
     if (file_exists($file)){
-        
+
         include_once $file;
-        
+
         // If that element is set in the lang array, return it
         if (isset($lang[$string])){
             return $lang[$string];
         }
-        
+
     }
-    
+
     // Else return the string with square brackets to indicate it's missing
     return '[['.$string.']]';
-    
+
 }
 
 /**
@@ -89,22 +92,22 @@ function df_string($string, $app = false, $language = null){
  * @throws \DF\DFException
  */
 function df_call_routing(){
-        
+
     // Default variables
     $controller = false;
     $action = false;
     $arguments = false;
-    
+
     // Create router object
     $Router = new \DF\Router();
     $Router->setNamespace('DF\\App\\' . df_APP . '\\');
-    
+
     // Load any application-defined routes
     $routerFile = df_APP_ROOT . df_DS . 'config' . df_DS . 'Routes.php';
     if (!file_exists($routerFile)){
         \DF\Exceptions\FileException::fileDoesNotExist($routerFile);
     }
-    
+
     include_once $routerFile;
 
     // Resolve the route
@@ -112,71 +115,72 @@ function df_call_routing(){
         'uri' => $_SERVER['REQUEST_URI'],
         'method' => $_SERVER['REQUEST_METHOD']
     ) );
-                
+
+
     // If we returned an array, then it should contain the controller and method
     if (is_array($resolve)){
-        
+
         $controller = (strlen($resolve['controller'])) ? $resolve['controller'] : false;
         $action = (strlen($resolve['action'])) ? $resolve['action'] : false;
         $arguments = (isset($resolve['arguments'])) ? $resolve['arguments'] : false;
         $module = (isset($resolve['module'])) ? $resolve['module'] : false;
-        
+
         $Controller = new $controller($module);
-               
+
     } else {
-        
+
         // If we set a route to return something, instead of redirect, just echo it out
         echo $resolve;
         \df_stop();
-        
+
     }
-        
+
     // If no action set, use the default "main" method
     if ($action === false){
         $action = 'main';
     }
-        
-    $Controller->setAction($action, $resolve['method']);
+
+    $Controller->setAction($action, $_SERVER['REQUEST_METHOD']);
     $Controller->setParams($arguments);
     $Controller->run();
-    $Controller->getTemplate()->render();    
-    
+    $Controller->getTemplate()->render();
+
 }
 
 /**
  * Setup various system settings
  */
 function df_setup(){
-    
+
     global $cfg, $db;
-            
+
     // Register Error Handler first, so that can be used if there are any errors in the setup
     if ($cfg->env == 'dev' && class_exists('\Whoops\Run')){
         $whoops = new \Whoops\Run();
         $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
         $whoops->register();
     }
-    
+
     // Make sure that a URL has been specified in the config
     if (strlen($cfg->www) == 0){
         \DF\Exceptions\ConfigException::www();
     }
-    
+
     // Start the DF session
     \DF\Helpers\Session::init();
-        
+
     // If an environment is set, use that, otherwise we'll assume live to be safe
     if (!isset($cfg->env)){
         $cfg->env = 'live';
     }
-       
-    
+
+
     // If we are using one of the 2 default environments, load them
     switch($cfg->env)
     {
 
         case 'dev':
-            
+
             error_reporting(E_ALL);
             ini_set("display_errors", 1);
             ini_set("log_errors", 1);
@@ -193,9 +197,9 @@ function df_setup(){
             ini_set("log_errors", 1);
             ini_set("error_log", df_APP_ROOT . df_DS . 'tmp' . df_DS . 'logs' . df_DS . 'error.log');
         break;
-    
+
         case 'custom':
-            
+
             // Check for a defined environment, based on server hostname
             if (file_exists(df_APP_ROOT . df_DS . 'config' . df_DS . 'Env.php')){
 
@@ -209,38 +213,38 @@ function df_setup(){
                 }
 
             }
-            
+
         break;
-    
-    
+
+
     }
-    
-    
+
+
     // Set headers
     if (isset($cfg->charset)){
         header('Content-Type: text/html; charset='.$cfg->charset);
     }
-    
+
     // Set timezone
     if (isset($cfg->timezone)){
         date_default_timezone_set($cfg->timezone);
     }
-    
+
     // If they are using composer and have a vendor/autoload.php file, automatically include that
     if (file_exists(df_APP_ROOT . df_DS . 'vendor/autoload.php')){
         require_once df_APP_ROOT . df_DS . 'vendor/autoload.php';
     }
-    
+
     // If database info is set, let's create a global db object
-    if ( isset($cfg->db_driver) && !empty($cfg->db_driver) 
+    if ( isset($cfg->db_driver) && !empty($cfg->db_driver)
           && isset($cfg->db_host) && !empty($cfg->db_host)
           && isset($cfg->db_name)
           && isset($cfg->db_user) && !empty($cfg->db_user)
           && isset($cfg->db_pass)){
-        
+
                 $db = \DF\DB\PDO::instantiate($cfg->db_driver, $cfg->db_host, $cfg->db_user, $cfg->db_pass);
                 if ($db){
-                    
+
                     // Connect - If we fail connection set the $db object to false
                     $dbname = ($cfg->db_name != '') ? $cfg->db_name : false;
                     if (!$db->connect($dbname)){
@@ -248,19 +252,19 @@ function df_setup(){
                         // err msg?
                         df_stop();
                     }
-                    
+
                     // prefix
                     if ($db && isset($cfg->db_prefix)){
                         $db->setPrefix($cfg->db_prefix);
                     }
-                    
+
                 }
-        
+
     }
-        
+
     // If we have a database connection, check out Config.php file for any extras we want to load
     if ( (isset($db) && $db) && isset($cfg->config_table) ){
-                
+
         // Temporarily set the fetch mode for the this query, then reset it afterwards
         $db->get()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_KEY_PAIR);
         $results = $db->selectAll($cfg->config_table, array(), null, 'setting,value');
@@ -268,35 +272,35 @@ function df_setup(){
             $cfg->config = (object)$results->all();
         }
         $db->get()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
-        
+
     }
-        
-    
-    
+
+
+
     // If they have defined a lib.php file, automatically include that
     if (file_exists(df_APP_ROOT . df_DS . 'lib.php')){
         require_once df_APP_ROOT . df_DS . 'lib.php';
     }
-    
+
     // Load the session if its set
     if (file_exists(df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php')){
         global $User;
         require_once df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php';
     }
-        
+
 }
 
 /**
  * Log something to a tmp log file
- * @param type $log 
+ * @param type $log
  */
 function df_log($log, $file = null){
-    
+
     // If no file defined, log to today's file
     if (is_null($file)){
         $file = date('Ymd', time()) . '.log';
     }
-    
+
     // Open file with append flag
     $fh = fopen( df_APP_ROOT . df_DS . 'tmp' . df_DS . 'logs' . df_DS . $file, 'a+');
     if ($fh){
@@ -307,12 +311,12 @@ function df_log($log, $file = null){
         }
     }
     fclose($fh);
-    
+
 }
 
 /**
  * Run some text through htmlspecialchars with ENT_QUOTES and return the result
- * @param string $text 
+ * @param string $text
  */
 function df_html($text){
     global $cfg;
@@ -333,12 +337,12 @@ function df_text($text){
  * @param type $str
  */
 function df_empty($str){
-    
+
     $str = (string)$str;
     $str = trim($str);
-    
+
     return ($str === "") ? true : false;
-    
+
 }
 
 
@@ -346,17 +350,17 @@ function df_empty($str){
  * Get which theme we are using
  */
 function df_get_theme(){
-    
+
     global $cfg;
-    
+
     \DF\App::uses("Setting");
     $class = "\DF\\".df_APP."\Setting";
     $setting = $class::getSetting("theme");
-    
+
     if (!isset($cfg->theme)) $cfg->theme = '';
-    
+
     return ($setting) ? $setting->value : $cfg->theme;
-    
+
 }
 
 /**
@@ -366,21 +370,21 @@ function df_get_theme(){
  * @param type $link
  */
 function df_print_page_bar($maxPages, $currentPage, $link, $formData = false, $range = DF_PAGINATION_RANGE){
- 
+
     $output = "";
-    
+
     // Only 1 page - don't bother
     if ($maxPages == 1 || $currentPage > $maxPages)
     {
         return $output;
     }
-            
+
     $next = $currentPage + 1;
     if ($next > $maxPages) $next = $maxPages;
-    
+
     $previous = $currentPage - 1;
     if ($previous < 1) $previous = 1;
-    
+
     if ($formData)
     {
         $formID = "pagination-form-" . mt_rand(1, 9999);
@@ -401,28 +405,28 @@ function df_print_page_bar($maxPages, $currentPage, $link, $formData = false, $r
         }
         $output .= "<input id='current-page-input' type='hidden' name='page' value='{$currentPage}' />";
     }
-    
+
     $output .= "<ul class='pages'>";
-    
+
         $output .= "<li><a href='{$link}{$previous}' class='click-page-number' page='{$previous}'>".\df_string('previous')."</a></li>";
-        
+
         if ($currentPage > 1){
             $output .= "<li><a href='{$link}1' class='click-page-number' page='1'>1</a></li>";
         }
-        
-        
-        
+
+
+
         // If we have more pages than we can list, just list a few either side of the current page
-        
+
         if ($maxPages > $range)
         {
             $before = $currentPage - $range;
             $after = $currentPage + $range;
-            
+
             if ($before > 2){
                 $output .= "<li class='pages-skip'>...</li>";
             }
-            
+
             for ($i = $before; $i < $currentPage; $i++)
             {
                 if ($i > 1)
@@ -430,9 +434,9 @@ function df_print_page_bar($maxPages, $currentPage, $link, $formData = false, $r
                     $output .= "<li><a href='{$link}{$i}' class='click-page-number' page='{$i}'>{$i}</a></li>";
                 }
             }
-            
+
             $output .= "<li class='current-page'><a href='#'>{$currentPage}</a></li>";
-            
+
             for ($i = $currentPage + 1; $i <= $after; $i++)
             {
                 if ($i < $maxPages)
@@ -440,30 +444,30 @@ function df_print_page_bar($maxPages, $currentPage, $link, $formData = false, $r
                     $output .= "<li><a href='{$link}{$i}' class='click-page-number' page='{$i}'>{$i}</a></li>";
                 }
             }
-            
+
             if ($after < ($maxPages - 1)){
                 $output .= "<li class='pages-skip'>...</li>";
             }
-            
+
         }
         else
         {
             $output .= "<li class='current-page'><a href='#'>{$currentPage}</a></li>";
         }
-        
+
         if ($maxPages > $currentPage){
             $output .= "<li><a href='{$link}{$maxPages}' class='click-page-number' page='{$maxPages}'>{$maxPages}</a></li>";
         }
         $output .= "<li><a href='{$link}{$next}' class='click-page-number' page='{$next}'>".\df_string('next')."</a></li>";
-        
+
     $output .= "</ul>";
-    
+
     if ($formData)
     {
         $output .= "</form>";
-        
+
         $output .= "<script>
-        
+
         $('a.click-page-number').off('click');
         $('a.click-page-number').on('click', function(){
 
@@ -475,11 +479,11 @@ function df_print_page_bar($maxPages, $currentPage, $link, $formData = false, $r
         });
 
         </script>";
-        
+
     }
-    
+
     echo $output;
-    
+
 }
 
 
@@ -491,31 +495,31 @@ function df_print_page_bar($maxPages, $currentPage, $link, $formData = false, $r
  * @param type $name
  */
 function df_upload_file($tmpFile, $newLocation, $name){
-    
+
     $return = array(
         'result' => false,
         'error' => false
     );
-    
+
     if (!is_file($tmpFile)){
         $return['error'] = df_string('errors:filenotfound');
         return $return;
     }
-    
+
     if (!is_writable($newLocation)){
         $return['error'] = df_string('errors:dirnotwritable');
         $return['error'] = str_replace("%dir%", $newLocation, $return['error']);
         return $return;
     }
-    
+
     if (!move_uploaded_file($tmpFile, $newLocation . "/" . $name)){
         $return['error'] = df_string('errors:uploadfail');
         return $return;
     }
-    
+
     $return['result'] = true;
     return $return;
-    
+
 }
 
 /**
@@ -524,9 +528,9 @@ function df_upload_file($tmpFile, $newLocation, $name){
  * @return type
  */
 function df_get_file_extension($filename){
-    
+
     return strtolower(substr( strrchr($filename, '.'), 1 ));
-    
+
 }
 
 
@@ -537,16 +541,16 @@ function df_get_file_extension($filename){
  * @return boolean
  */
 function df_attributes_to_string($attributes){
-    
+
     if (is_null($attributes) || $attributes === false){
         return false;
     }
-    
+
     // Should only be 1 dimensional
     if (!array_is_multi($attributes)){
-        
+
         $list = array();
-        
+
         foreach($attributes as $key => $val){
             if ($val !== false && !is_null($val)){
                 if (is_string($key)){
@@ -556,13 +560,13 @@ function df_attributes_to_string($attributes){
                 }
             }
         }
-        
+
         return implode(" ", $list);
-        
+
     }
-    
+
     return false;
-    
+
 }
 
 
@@ -576,7 +580,7 @@ function df_attributes_to_string($attributes){
  */
 function df_get_bytes_from_upload_max_filesize($val)
 {
-    
+
     $val = trim($val);
     $last = strtolower($val[strlen($val)-1]);
     switch($last) {
@@ -589,7 +593,7 @@ function df_get_bytes_from_upload_max_filesize($val)
     }
 
     return $val;
-    
+
 }
 
 /**
@@ -599,7 +603,7 @@ function df_get_bytes_from_upload_max_filesize($val)
  * @return type
  */
 function df_convert_bytes_to_hr($bytes, $precision = 2)
-{	
+{
     $kilobyte = 1024;
     $megabyte = $kilobyte * 1024;
     $gigabyte = $megabyte * 1024;
@@ -625,14 +629,14 @@ function df_convert_bytes_to_hr($bytes, $precision = 2)
 }
 
 function df_convert_url(&$url){
-    
+
     $Validate = new \GUMP();
     $Validate->validation_rules( array('url' => 'required|valid_url') );
     if (!$Validate->run( array('url' => $url) )){
         global $cfg;
         $url = $cfg->www . '/' . $url;
     }
-    
+
 }
 
 function df_get_class_namespace($class) {
@@ -704,7 +708,7 @@ function string_begins($haystack, $needle)
 {
     return \DF\Helpers\Str::begins($haystack, $needle);
 }
- 
+
 /**
 * Check if a string ends with specific characters
 * @param type $haystack
@@ -715,7 +719,7 @@ function string_ends($haystack, $needle)
 {
     return \DF\Helpers\Str::ends($haystack, $needle);
 }
- 
+
 /**
 * Check if a string contains another string
 * @param type $haystack
@@ -740,13 +744,13 @@ function string_increment($str)
 /**
  * Cycle through a list of strings, getting the next one each time this is called
  * Example:
- * 
+ *
  *  $colours = 'white,red,blue';
  *  foreach($tableRows as $row)
  *  {
  *      $rowColour = Str::cycle($colours, 'colour', ',');
  *  }
- * 
+ *
  *  This will alternate between white, red and blue and continue to loop through them each time it is called
  * @param type $str The string to cycle through, using the delim to split it
  * @param type $delim Default separator is a comma
@@ -773,7 +777,7 @@ function string_cycle($str, $delim = ',', $id = '')
 function array_average(array $array, $key){
     return \DF\Helpers\Arr::avg($array, $key);
 }
-    
+
 /**
  * Find elements in a multidimensional array, using dot notation, e.g. names.Conn.age
  * @param array $array
@@ -843,7 +847,7 @@ function array_last(array $array, Closure $function, $default = false){
  * Add a key => val relationship onto an existing array. If such an relationship already exists, the flag option will define what we should do
  * @param type $array
  * @param type $key
- * @param type $val 
+ * @param type $val
  */
 function array_add(&$array, $key, $val = null, $flag = \DF\Helpers\Arr::ARR_EXISTS_SKIP){
     return \DF\Helpers\Arr::add($array, $key, $val, $flag);
@@ -851,7 +855,7 @@ function array_add(&$array, $key, $val = null, $flag = \DF\Helpers\Arr::ARR_EXIS
 
 /**
  * Return two seperate arrays, one of keys, one of values
- * @param array $array 
+ * @param array $array
  * @param bool $recursive If this is true, then if the value is itself an array, it will run array_split over that as well, and any sub-arrays beyond that
  */
 function array_split(&$array, $recursive = false){
@@ -861,7 +865,7 @@ function array_split(&$array, $recursive = false){
 /**
  * Return an array, excluding any elements with the keys/values as defined
  * @param type $array
- * @param type $exclude 
+ * @param type $exclude
  */
 function array_grep($array, $exclude = array(), $flag = \DF\Helpers\Arr::ARR_USE_VALS){
     return \DF\Helpers\Arr::grep($array, $exclude, $flag);
@@ -931,4 +935,19 @@ function array_total(array &$array, $key){
  */
 function array_insert(array &$array, $value, $position = null){
     return DF\Helpers\Arr::insert($array, $value, $position);
+}
+
+
+
+
+
+// Object Helper Functions
+function object_find_by_property($arrayOfObjects, $prop, $val){
+
+  $return = array_filter($arrayOfObjects, function($el) use ($prop, $val){
+    return (strtolower($el->$prop) === strtolower($val));
+  });
+
+  return (count($return) == 1) ? array_shift($return) : false;
+
 }

@@ -85,7 +85,7 @@ class RouteFactory implements RouteFactoryInterface
 	 * Create an array from the method(s)
 	 *
 	 * @param  string $method
-	 * 
+	 *
 	 * @return array
 	 */
 	private function parseMethod($method)
