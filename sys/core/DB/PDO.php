@@ -244,8 +244,13 @@ abstract class PDO implements \DF\Database {
                     // Otherwise we are using unnamed
                     else
                     {
-                        $sql .= "{$this->wrap($field)} = ? AND ";
-                        $sqlParams[] = $val;
+                        // Is the value null?
+                        if (is_null($val)){
+                          $sql .= "{$this->wrap($field)} IS NULL AND ";
+                        } else {
+                          $sql .= "{$this->wrap($field)} = ? AND ";
+                          $sqlParams[] = $val;
+                        }
                     }
                 }
                 $sql = substr($sql, 0, -4);
@@ -332,7 +337,7 @@ abstract class PDO implements \DF\Database {
      * @param array $params An array of parameters to use
      * @return Recordset Recordset of results
      */
-    public function selectSQL($sql, $params = array()){
+    public function selectSQL($sql, $params = array(), $order = null, $limitFrom = 0, $limit = null){
 
         if (!$this->DBC) return false;
 
@@ -341,6 +346,14 @@ abstract class PDO implements \DF\Database {
             if (!is_array($params)) $params = (array)$params;
 
             $sql = $this->processSQLForTableNames($sql);
+
+            // Order
+            if (!is_null($order)){
+                $sql .= " ORDER BY {$order} ";
+            }
+
+            // Apply LIMIT
+            $sql .= $this->postLimit($limit, $limitFrom);
 
             $st = $this->DBC->prepare($sql);
             $st->execute($params);
@@ -545,7 +558,7 @@ abstract class PDO implements \DF\Database {
             }
 
             // Apply LIMIT
-            $sql .= $this->postLimit("{$limit}");
+            $sql .= $this->postLimit($limit);
 
             $st = $this->DBC->prepare($sql);
             $st->execute($sqlParams);

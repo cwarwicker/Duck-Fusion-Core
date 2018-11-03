@@ -21,7 +21,7 @@
 /**
  *
  * Arr
- * 
+ *
  * This Helper class provides various methods for working with arrays.
  * Each method can also be accessed via a global function, defined in the common/Functions.php file
  *
@@ -37,7 +37,7 @@ namespace DF\Helpers;
 
 abstract class Arr
 {
-    
+
     const ARR_EXISTS_SKIP = 0; # If an element in the array already exists with that key, do nothing
     const ARR_EXISTS_OVERWRITE = 1; # If an element in the array already exists with that key, overwrite it
     const ARR_EXISTS_APPEND = 2; # If an element in the array already exists with that key, convert it to an array and append the new value
@@ -49,8 +49,8 @@ abstract class Arr
     const ARR_SORT_DESC = 'desc';
     const ARR_SORT_BY_VALUE = 'v';
     const ARR_SORT_BY_KEY = 'k';
-    
-    
+
+
     /**
      * Total up the values of a given key in the array and work out an average
      * @param array $array
@@ -58,28 +58,50 @@ abstract class Arr
      * @return type
      */
     public static function avg(array $array, $key){
-        
+
         $cnt = 0;
         $sum = 0;
-        
+
         foreach($array as $element => $values){
             if (array_key_exists($key, $values)){
                 $cnt++;
                 $sum += $values[$key];
             }
         }
-        
+
         return ($sum / $cnt);
-        
+
     }
-    
-    
+
+
+    /**
+     * Total up the values of a given key in the array
+     * @param array $array
+     * @param type $key
+     * @return type
+     */
+    public static function summation($array, $key){
+
+        $array = (array)$array;
+        $sum = 0;
+
+        foreach($array as $element => $values){
+            if (array_key_exists($key, $values)){
+                $sum += $values[$key];
+            }
+        }
+
+        return $sum;
+
+    }
+
+
     /**
      * Find elements in a multidimensional array, using dot notation
      * Example:
-     * 
+     *
      * Consider we had a multidimensional array with several levels, such as:
-     * 
+     *
      * $array = array(
 
             'people' => array(
@@ -98,11 +120,11 @@ abstract class Arr
             )
 
         );
-     * 
+     *
      * Normally if you wanted to get say example the age of conn, you'd do something like: (isset($array['people']['conn']['age'])) ? $array['people']['conn']['age'] : false;
-     * 
+     *
      * You can do the same thing here by using the find method and dot notation: \DF\Helpers\Array::find( $array, 'people.conn.age' );
-     * 
+     *
      * @param array $array
      * @param type $find
      * @return boolean
@@ -110,13 +132,13 @@ abstract class Arr
     public static function find(array $array, $find){
 
         $return = $array;
-        
+
         $split = explode('.', $find);
         if ($split)
         {
             foreach($split as $key)
             {
-                                
+
                 if (is_array($return) && array_key_exists($key, $return))
                 {
                     $return = $return[$key];
@@ -131,7 +153,7 @@ abstract class Arr
         return $return;
 
     }
-    
+
     /**
      * Check if an array has a specified element, using dot notation
      * @param array $array
@@ -139,24 +161,24 @@ abstract class Arr
      * @return type
      */
     public static function has(array $array, $find){
-        
+
         $result = self::find($array, $find);
         return ($result !== false);
-        
+
     }
 
 
     /**
      * Get elements from an array, where they meet the requirements laid out in the Closure function
-     * 
+     *
      * Example:
-     * 
+     *
      *  $array = array(100, '200', 300, '400', 500);
      *
      *   var_dump( \DF\Helpers\Arr::where($array, function($k, $v){
      *       return ($v > 300);
      *   }) );
-     * 
+     *
      * @param array $array
      * @param \Closure $function
      * @return type
@@ -178,17 +200,17 @@ abstract class Arr
                 // Count how many parameters in the Closure
                 $reflection = new \ReflectionFunction($function);
                 $cntParams = count($reflection->getParameters());
-                
+
                 // If 2 parameters, pass in key then value
                 if ($cntParams == 2){
                     $result = call_user_func($function, $key, $value);
                 }
-                
+
                 // Else
                 else {
                     $result = call_user_func($function, $value);
                 }
-                
+
                 // If result was true, keep this value in the returned array
                 if ($result){
                     $tmpArray[$key] = $value;
@@ -241,18 +263,18 @@ abstract class Arr
     /**
      * Add a key => val relationship onto an existing array. If such an relationship already exists, the flag option will define what we should do
      * Uses dot notation to find the element, like in the Array::find method
-     * 
+     *
      * Examples:
-     * 
+     *
      *   var_dump( \DF\Helpers\Arr::add( $array, 'new', 'new one' ) );
      *   var_dump( \DF\Helpers\Arr::add( $array, 'people.liz.hair', 'pink', self::ARR_EXISTS_APPEND ) );
      *   var_dump( \DF\Helpers\Arr::add( $array, 'people.conn.age', 18 ) );
      *   var_dump( \DF\Helpers\Arr::add( $array, 'people', 'test' ) );
      *   var_dump( \DF\Helpers\Arr::add( $array, 'people.conn.age', 38 ) );
-     * 
+     *
      * @param type $array
      * @param type $key
-     * @param type $val 
+     * @param type $val
      */
     public static function add(&$array, $key, $val = null, $flag = self::ARR_EXISTS_OVERWRITE){
 
@@ -261,58 +283,58 @@ abstract class Arr
             $array[] = $key;
             return $array;
         }
-                
+
         // Use the key to get the current value, using dot notation
         $el = self::find($array, $key);
-        
+
         // Not set, so just set it
         if ($el === false){
-            
+
             // Set the value
             self::set($array, $key, $val);
             return $array;
-            
+
         }
-        
+
         // Otherwise that element must already exist, so what do we want to do with it?
         switch($flag)
         {
-            
+
             case self::ARR_EXISTS_APPEND:
-                
+
                 // If not an array, make it into an array
                 if (!is_array($el)){
                     $el = array( $el );
                 }
-                
+
                 // Append to it
                 array_push($el, $val);
-                
+
                 // Set the array as the value
                 self::set($array, $key, $el);
-                
+
                 return $array;
-                
+
             break;
-            
+
             case self::ARR_EXISTS_OVERWRITE:
-                
+
                 // Just set it normally as if it didn't exist
                 self::set($array, $key, $val);
                 return $array;
-                
+
             break;
-        
+
             case self::ARR_EXISTS_SKIP:
             default:
                 // Do nothing
                 return $array;
             break;
-        
+
         }
-        
+
     }
-    
+
     /**
      * Delete an element from a multi-dimensional array, using dot notation
      * @param array $array
@@ -320,32 +342,32 @@ abstract class Arr
      * @return boolean
      */
     public static function delete(array &$array, $key){
-                                
+
         $split = explode('.', $key);
         if ($split && array_key_exists($split[0], $array))
         {
-            
+
             // Take next element off the dot notation converted array
             $next = array_shift($split);
-            
+
             // If there are still more levels to go down, call delete() again
             if (!empty($split))
             {
                 return self::delete($array[$next], implode('.', $split));
             }
-            
+
             // This is the last element, so this is the one we want to delete
             else
             {
                 unset($array[$next]);
             }
-            
+
         }
-        
+
         return true;
-        
+
     }
-    
+
     /**
      * Total up the values of a given key in the array
      * @param array $array
@@ -353,17 +375,17 @@ abstract class Arr
      * @return type
      */
     public static function total(array $array, $key){
-        
+
         $sum = 0;
-        
+
         foreach($array as $element => $values){
             $sum += (array_key_exists($key, $values)) ? $values[$key] : 0;
         }
-        
+
         return $sum;
-        
+
     }
-    
+
     /**
      * Set a given element within an array to a specific value, using dot notation to move down through the sub elements of the keys
      * It's essentially the same as doing an Arr::add($array, $key, $val, Arr::ARR_EXISTS_OVERWRITE) except it returns the parent of the element you updated, instead of the whole array
@@ -373,7 +395,7 @@ abstract class Arr
      * @return type
      */
     public static function set(&$array, $key, $val){
-        
+
         $keys = explode('.', $key);
         while (count($keys) > 1)
         {
@@ -398,16 +420,16 @@ abstract class Arr
         // Get the first key again - This should be the last one left after we went through all the previous levels in the dot notation
         $key = array_shift($keys);
         $array[$key] = $val;
-        
+
         // This will return the new element, not the final array - that will be updated in the source of the $array variable since it was passed in by reference
         return $array;
-        
+
     }
 
     /**
      * Return two seperate arrays, one of keys, one of values
      * !!!!I'm not sure if this one works as I intended it, I can't remember!!!!
-     * @param array $array 
+     * @param array $array
      * @param bool $recursive If this is true, then if the value is itself an array, it will run array_split over that as well, and any sub-arrays beyond that
      */
     public static function split(&$array, $recursive = false){
@@ -430,12 +452,12 @@ abstract class Arr
     /**
      * Return an array, excluding any elements with the keys/values as defined
      * @param type $array
-     * @param type $exclude 
+     * @param type $exclude
      */
     public static function grep($array, $exclude = array(), $flag = self::ARR_USE_VALS){
 
         $tmpArray = array();
-        
+
         if (!empty($array) && !empty($exclude) ){
 
             foreach($array as $k => $v){
@@ -485,7 +507,7 @@ abstract class Arr
      * @param type $reset
      * @return boolean
      */
-    public static function flatten($array, $glue = '', $reset = true) { 
+    public static function flatten($array, $glue = '', $reset = true) {
 
         if (!is_array($array)){
             return false;
@@ -533,16 +555,16 @@ abstract class Arr
      * @return boolean
      */
     public static function isMulti($array){
-        
-        if (!is_array($array)) { 
-            return false; 
-        } 
-        
+
+        if (!is_array($array)) {
+            return false;
+        }
+
         $elements = array_filter($array, 'is_array');
         return (count($elements) > 0);
-        
+
     }
-    
+
     /**
      * Sort an array in a given direction
      * @param type $array
@@ -551,11 +573,11 @@ abstract class Arr
      * @return boolean
      */
     public static function sort(&$array, $order, $sortBy = self::ARR_SORT_BY_VALUE){
-        
+
         if (!is_array($array)){
            return false;
         }
-       
+
         switch($order)
         {
             case self::ARR_SORT_ASC:
@@ -580,13 +602,13 @@ abstract class Arr
                     break;
                 }
             break;
-            
+
         }
-       
+
         return $array;
-        
+
     }
-    
+
     /**
      * Insert a value into an indexed array
      * @param array $array
@@ -596,32 +618,40 @@ abstract class Arr
      * @throws \InvalidArgumentException
      */
     public static function insert(array &$array, $value, $position = null){
-        
+
         $cnt = count($array);
         if (is_null($position)){
             $position = $cnt - 1;
         }
-        
+
         // Make sure the position is valid
         if (abs($position) > $cnt){
             throw new \InvalidArgumentException('Array position out of bounds');
         }
-        
-        array_splice($array, $position, 0, $value);        
-        
+
+        array_splice($array, $position, 0, $value);
+
         return $array;
-        
+
     }
-    
-    
+
+    /**
+     * Check if an array has all of the keys specified
+     * @param array $keys
+     * @param array $array
+     * @return boolean
+     */
+    public static function hasKeys(array $keys, array $array){
+
+        foreach($keys as $key){
+            if (!array_key_exists($key, $array)){
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+
 }
-
-
-
-
-
-
-
-
-
-

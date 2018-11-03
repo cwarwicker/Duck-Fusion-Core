@@ -125,7 +125,7 @@ function df_call_routing(){
         $arguments = (isset($resolve['arguments'])) ? $resolve['arguments'] : false;
         $module = (isset($resolve['module'])) ? $resolve['module'] : false;
 
-        $Controller = new $controller($module);
+        $Controller = new $controller($module, $action);
 
     } else {
 
@@ -183,8 +183,9 @@ function df_setup(){
 
             error_reporting(E_ALL);
             ini_set("display_errors", 1);
-            ini_set("log_errors", 1);
-            ini_set("error_log", df_APP_ROOT . df_DS . 'tmp' . df_DS . 'logs' . df_DS . 'error.log');
+            ini_set('xdebug.var_display_max_depth', 8);
+            ini_set('xdebug.var_display_max_children', 256);
+            ini_set('xdebug.var_display_max_data', 1024);
 
             // Calculate how long page load takes
             \PHP_Timer::start();
@@ -284,7 +285,7 @@ function df_setup(){
 
     // Load the session if its set
     if (file_exists(df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php')){
-        global $User;
+        global $User, $Staff;
         require_once df_APP_ROOT . df_DS . 'config' . df_DS . 'Session.php';
     }
 
@@ -648,6 +649,9 @@ function df_get_class_name($class){
     return array_pop($explode);
 }
 
+function df_create_sql_placeholders($params){
+    return implode(',', array_fill(0, count($params), '?'));
+}
 
 
 
@@ -776,6 +780,16 @@ function string_cycle($str, $delim = ',', $id = '')
  */
 function array_average(array $array, $key){
     return \DF\Helpers\Arr::avg($array, $key);
+}
+
+/**
+ * Total up the values of a given key in the array
+ * @param array $array
+ * @param type $key
+ * @return type
+ */
+function array_summation($array, $key){
+    return \DF\Helpers\Arr::summation($array, $key);
 }
 
 /**
@@ -936,6 +950,18 @@ function array_total(array &$array, $key){
 function array_insert(array &$array, $value, $position = null){
     return DF\Helpers\Arr::insert($array, $value, $position);
 }
+
+/**
+ * Check if an array has all of the keys specified
+ * @param array $keys
+ * @param array $array
+ * @return boolean
+ */
+function array_has_keys(array $keys, array $array){
+    return DF\Helpers\Arr::hasKeys($keys, $array);
+}
+
+
 
 
 

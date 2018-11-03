@@ -1032,6 +1032,20 @@ class Quack extends Renderer {
                 $txt = "strrev({$txt})";
             break;
 
+            case 'nl2br':
+              $txt = "nl2br({$txt})";
+            break;
+
+            case 'safe':
+
+                if ($options && strtolower($options[0]) == 'quotes'){
+                  $txt = "\addslashes({$txt})";
+                } else {
+                  $txt = "\df_html({$txt})";
+                }
+
+            break;
+
             case 'cycle':
 
                 // If using an array

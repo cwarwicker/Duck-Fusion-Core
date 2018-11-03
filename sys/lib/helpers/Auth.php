@@ -43,11 +43,27 @@ class Auth
     protected $method = self::DEFAULT_METHOD;
     protected $db = null;
 
+    protected $table = null;
+    protected $ident_field = null;
+    protected $session_key = null;
+    protected $alsoCheck = null;
 
     public function __construct(){
 
-        global $db;
+        global $cfg, $db;
         $this->db = $db;
+
+        if (isset($cfg->config->user_table) && !is_null($cfg->config->user_table)){
+          $this->table = $cfg->config->user_table;
+        }
+
+        if (isset($cfg->config->user_identfield) && !is_null($cfg->config->user_identfield)){
+          $this->ident_field = $cfg->config->user_identfield;
+        }
+
+        if (isset($cfg->config->session_name, $cfg->config->site_token)){
+          $this->session_key = $cfg->config->session_name . '__' . $cfg->config->site_token;
+        }
 
     }
 
@@ -69,6 +85,25 @@ class Auth
         return $this->method;
     }
 
+    public function useTable($table){
+      $this->table = $table;
+      return $this;
+    }
+
+    public function useIdentField($field){
+      $this->ident_field = $field;
+      return $this;
+    }
+
+    public function useSessionKey($key){
+      $this->session_key = $key;
+      return $this;
+    }
+
+    public function alsoCheck(array $alsoCheckArray){
+      $this->alsoCheck = $alsoCheckArray;
+      return $this;
+    }
 
     /**
      *
@@ -87,7 +122,7 @@ class Auth
         $return = array('result' => false);
 
         // Check if configuration details are stored to enable us to try and authenticate
-        if (!is_null(@$cfg->config->user_table) && !is_null(@$cfg->config->user_identfield)){
+        if (!is_null($this->table) && !is_null($this->ident_field)){
 
             // First see if the user exists at all
             $uID = $this->getUID( $ident );
@@ -100,7 +135,7 @@ class Auth
             $user = $this->getUser($uID);
 
             // Check it's not been deleted
-            if ($user->deleted != 0){
+            if (isset($user->deleted) && $user->deleted != 0){
                 $return['message'] = \df_string('errors:invalidlogin');
                 return $return;
             }
@@ -112,9 +147,19 @@ class Auth
             }
 
             // Now check if the user has been confirmed
-            if ($user->confirmed != 1){
+            if (isset($user->confirmed) && $user->confirmed != 1){
                 $return['message'] = \df_string('errors:userunconfirmed');
                 return $return;
+            }
+
+            // Were there any other fields we needed to check?
+            if (!is_null($this->alsoCheck)){
+              foreach($this->alsoCheck as $field => $val){
+                if (!isset($user->$field) || $user->$field != $val){
+                  $return['message'] = \df_string('errors:invalidlogin');
+                  return $return;
+                }
+              }
             }
 
             // At this point, everything should be ok, so set the user in a session
@@ -170,9 +215,7 @@ class Auth
      */
     protected function getUser($id){
 
-        global $cfg;
-
-        $user = $this->db->select($cfg->config->user_table, array('id' => $id));
+        $user = $this->db->select($this->table, array('id' => $id));
         if (!$user){
             return false;
         }
@@ -186,9 +229,7 @@ class Auth
      * @return type
      */
     public function getLoggedInUserID(){
-
-        return \DF\Helpers\Session::read( \DF\Helpers\Auth::getSessionKey() );
-
+        return \DF\Helpers\Session::read( self::getSessionKey() );
     }
 
     /**
@@ -199,9 +240,7 @@ class Auth
      */
     protected function getUID($ident){
 
-        global $cfg;
-
-        $user = $this->db->select($cfg->config->user_table, array($cfg->config->user_identfield => $ident), null, 'id');
+        $user = $this->db->select($this->table, array($this->ident_field => $ident), null, 'id');
         return ($user) ? $user->id : false;
 
     }
@@ -246,10 +285,10 @@ class Auth
      * @global \DF\Helpers\type $cfg
      * @return type
      */
-    public static function getSessionKey(){
-        global $cfg;
-        return $cfg->config->session_name . '__' . $cfg->config->site_token;
+    public function getSessionKey(){
+        return $this->session_key;
     }
+
 
 
 }
