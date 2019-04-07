@@ -77,6 +77,7 @@ class Quack extends Renderer {
     const REGEX_SWITCH_CASE = "/@case(\W)?\((.+?)\)/U";
     const REGEX_SWITCH_DEFAULT = "/@default/";
     const REGEX_ENDSWITCH = "/@endswitch/";
+    const REGEX_ISSET = "/@isset(\W)?\((.*?)\)/U";
 
     // Loops
     const REGEX_FOREACH = "/@foreach(\W)?\((.+?)\)/U";
@@ -135,6 +136,7 @@ class Quack extends Renderer {
 
         $this->parseCaseSwitch($content); // Short/Simple version
 
+        $this->parseIsset($content);
 
 
         // Then parse for foreach loops
@@ -338,6 +340,35 @@ class Quack extends Renderer {
         }
 
     }
+
+    /**
+     * Parse an if statement
+     * @param type $content
+     */
+    protected function parseIsset(&$content){
+
+        if (preg_match_all(self::REGEX_ISSET, $content, $matches)){
+
+            $cnt = count($matches[0]);
+
+            for($i = 0; $i < $cnt; $i++)
+            {
+
+                $string = $matches[0][$i];
+                $condition = $matches[2][$i];
+
+                $params = explode(",", $condition);
+                $value = $params[0];
+                $default = $params[1];
+
+                $content = str_replace($string, "<?= (isset({$value})) ? $value : $default ?>", $content);
+
+            }
+
+        }
+
+    }
+
 
     /**
      * Parse an if statement
@@ -1131,6 +1162,7 @@ class Quack extends Renderer {
 
                     $var = $txt;
                     $default = $options[0];
+
                     $tmp = " ( (isset({$txt}) && !is_null({$txt}) && !\df_empty({$txt})) ? {$txt} : \n";
 
                     foreach($options as $option)

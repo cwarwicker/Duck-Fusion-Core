@@ -318,6 +318,7 @@ class Template {
      */
     public function render($args = false){
 
+
         if ($this->rendered){
             return false;
         }
